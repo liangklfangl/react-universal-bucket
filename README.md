@@ -1,1 +1,2 @@
-# react-universal-bucket
+1.没有找到webpack或者babel配置文件要抛出错误
+2.我们的两个loader即使是去掉exclude也是无法正常合并的，所以会导致两个规则被保留。最后解决方法是：wcf中不要求安装babel-loader，而是作为devDependencies，这样安装我们的webpackcc的时候不会安装babel，最后我们require.resolve得到的都是同一个最高级的文件下的babel-loader

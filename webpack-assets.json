@@ -1,0 +1,12 @@
+{
+  "javascript": {
+    "main": "http://localhost:8091/dist/main-cd3550ca62d9d5fd6e36.js",
+    "index": "http://localhost:8091/dist/index-cd3550ca62d9d5fd6e36.js"
+  },
+  "styles": {},
+  "assets": {
+    "./src/containers/App/App.less": {
+      "_style": ".container{border:1px solid red}"
+    }
+  }
+}
