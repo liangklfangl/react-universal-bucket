@@ -3,7 +3,8 @@ import {IndexRoute, Route} from 'react-router';
 import { isLoaded as isAuthLoaded, load as loadAuth } from './redux/modules/auth';
 import {
     App,
-    Home
+    Home,
+    Login
   } from './containers';
 //getRoutes(store)
 export default (store) => {
@@ -25,19 +26,20 @@ export default (store) => {
 
   /**
    * Please keep routes in alphabetical order
+   *   
    */
-  return ({
-       path:"/",
-       component : App,
-       IndexRoute:{
-         component : Home
-       },
-       childRoutes:[
-         {
-           component : Home,
-           path:"home"
-         }
+  return (
+      {
+        path:"/",
+        component:App,
+        indexRoute: { component: Home },
+        childRoutes: [
+          {
+            path:"login",
+            component:Login
+          }
         ]
-     }
-  );
+      }
+     
+  )
 };

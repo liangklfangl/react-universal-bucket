@@ -62,6 +62,7 @@ module.exports = {
 	entry:{
 	    'main': [
 	      'webpack-hot-middleware/client?path=http://' + host + ':' + port + '/__webpack_hmr',
+        "bootstrap-webpack!./src/theme/bootstrap.config.js",
 	      './src/client.js'
 	    ]
 	},
@@ -88,7 +89,13 @@ module.exports = {
      //https://github.com/liangklfang/webpack-isomorphic-tools
 	],
    module:{
-      rules:[{
+      rules:[
+        { test: /\.woff(\?v=\d+\.\d+\.\d+)?$/, loader: "url-loader?limit=10000&mimetype=application/font-woff" },
+        { test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/, loader: "url-loader?limit=10000&mimetype=application/font-woff" },
+        { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: "url-loader?limit=10000&mimetype=application/octet-stream" },
+        { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: "file-loader" },
+        { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: "url-loader?limit=10000&mimetype=image/svg+xml" },
+        {
            test: webpackIsomorphicToolsPlugin.regular_expression('images'), 
            //这个images是从我们的webpack-isomorphic-tools.config.js中读取的
            use: {

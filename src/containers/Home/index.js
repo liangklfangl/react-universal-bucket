@@ -4,8 +4,8 @@ export default class Home extends React.Component{
      console.log("home instantiated");
 
 		return (
-             <div>
-                Home
+             <div style={{fontSize:"20px"}}>
+               HOME
              </div>
 			)
 	}
