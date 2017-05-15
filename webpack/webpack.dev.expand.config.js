@@ -63,6 +63,7 @@ module.exports = {
 	    'main': [
 	      'webpack-hot-middleware/client?path=http://' + host + ':' + port + '/__webpack_hmr',
         "bootstrap-webpack!./src/theme/bootstrap.config.js",
+        //确保安装bootstrap3，bootstrap4不支持less
 	      './src/client.js'
 	    ]
 	},
@@ -97,7 +98,13 @@ module.exports = {
         { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: "url-loader?limit=10000&mimetype=image/svg+xml" },
         {
            test: webpackIsomorphicToolsPlugin.regular_expression('images'), 
-           //这个images是从我们的webpack-isomorphic-tools.config.js中读取的
+           //这个images是从我们的webpack-isomorphic-tools.config.js中读取的，包含jpg,png等所有的图片
+           // extensions: [
+            //   'jpeg',
+            //   'jpg',
+            //   'png',
+            //   'gif'
+            // ]
            use: {
              loader: require.resolve("url-loader"),
              options:{

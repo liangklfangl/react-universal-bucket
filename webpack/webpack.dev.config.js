@@ -1,17 +1,19 @@
 const build = require("webpackcc/lib/build");
 const path = require("path");
 const fs = require("fs");
+const omitPlugins = ["CommonsChunkPlugin","HtmlWebpackPlugin","ExtractTextPlugin","ImageminPlugin"];
 const program = {
     onlyCf : true,
     cwd : process.cwd(),
     dev : true,
     //不启动压缩
-    //下面这个hook用于去掉commonchunkplugin
+    //在hook执行之前已经被dedupe了，此处删除不需要的插件即可。
+    //在开发模式下我们要删除ExtractTextPlugin，因为我们wcf本身就不会将css单独抽取出来，所以删除
+    //HtmlWebpackPlugin我们采用了服务端渲染，所以不需要自动生成html页面
     hook:function(webpackConfig){
-         const commonchunkpluginIndex = webpackConfig.plugins.findIndex(plugin => {
-           return plugin.constructor.name == "CommonsChunkPlugin"
+         webpackConfig.plugins=webpackConfig.plugins.filter((plugin)=>{
+           return omitPlugins.indexOf(plugin.constructor.name)==-1
          });
-         webpackConfig.plugins.splice(commonchunkpluginIndex, 1);
          return webpackConfig;
     }
   };

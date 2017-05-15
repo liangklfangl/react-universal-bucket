@@ -3,7 +3,7 @@ require('../server.babel'); // babel registration (runtime transpilation for nod
 var path = require('path');
 var rootDir = path.resolve(__dirname, '..');
 // 注意：.development(__DEVELOPMENT__)方法已经过期，后面要用cross-env来设计
-process.env.NODE_ENV="development";
+// process.env.NODE_ENV="production";
 /**
  * Define isomorphic constants.
  */

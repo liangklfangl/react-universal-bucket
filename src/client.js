@@ -18,7 +18,7 @@ const store = createStore(browserHistory, client, window.__data);
 // const store = createStore(_browserHistory, client, window.__data);
 // const history = syncHistoryWithStore(_browserHistory, store);
 const history = syncHistoryWithStore(browserHistory, store);
-
+//
 function initSocket() {
   const socket = io('', {path: '/ws'});
   socket.on('news', (data) => {
