@@ -4,7 +4,7 @@
 
 namespace Sass {
 
-  Value_Ptr To_Value::fallback_impl(AST_Node_Ptr n)
+  Value* To_Value::fallback_impl(AST_Node* n)
   {
     // throw a runtime error if this happens
     // we want a well defined set of possible nodes
@@ -14,92 +14,92 @@ namespace Sass {
   }
 
   // Custom_Error is a valid value
-  Value_Ptr To_Value::operator()(Custom_Error_Ptr e)
+  Value* To_Value::operator()(Custom_Error* e)
   {
     return e;
   }
 
   // Custom_Warning is a valid value
-  Value_Ptr To_Value::operator()(Custom_Warning_Ptr w)
+  Value* To_Value::operator()(Custom_Warning* w)
   {
     return w;
   }
 
   // Boolean is a valid value
-  Value_Ptr To_Value::operator()(Boolean_Ptr b)
+  Value* To_Value::operator()(Boolean* b)
   {
     return b;
   }
 
   // Number is a valid value
-  Value_Ptr To_Value::operator()(Number_Ptr n)
+  Value* To_Value::operator()(Number* n)
   {
     return n;
   }
 
   // Color is a valid value
-  Value_Ptr To_Value::operator()(Color_Ptr c)
+  Value* To_Value::operator()(Color* c)
   {
     return c;
   }
 
   // String_Constant is a valid value
-  Value_Ptr To_Value::operator()(String_Constant_Ptr s)
+  Value* To_Value::operator()(String_Constant* s)
   {
     return s;
   }
 
   // String_Quoted is a valid value
-  Value_Ptr To_Value::operator()(String_Quoted_Ptr s)
+  Value* To_Value::operator()(String_Quoted* s)
   {
     return s;
   }
 
   // List is a valid value
-  Value_Ptr To_Value::operator()(List_Ptr l)
+  Value* To_Value::operator()(List* l)
   {
-    List_Obj ll = SASS_MEMORY_NEW(List,
+    List* ll = SASS_MEMORY_NEW(mem, List,
                                l->pstate(),
                                l->length(),
                                l->separator(),
                                l->is_arglist());
     for (size_t i = 0, L = l->length(); i < L; ++i) {
-      ll->append((*l)[i]->perform(this));
+      *ll << (*l)[i]->perform(this);
     }
-    return ll.detach();
+    return ll;
   }
 
   // Map is a valid value
-  Value_Ptr To_Value::operator()(Map_Ptr m)
+  Value* To_Value::operator()(Map* m)
   {
     return m;
   }
 
   // Null is a valid value
-  Value_Ptr To_Value::operator()(Null_Ptr n)
+  Value* To_Value::operator()(Null* n)
   {
     return n;
   }
 
   // Argument returns its value
-  Value_Ptr To_Value::operator()(Argument_Ptr arg)
+  Value* To_Value::operator()(Argument* arg)
   {
     if (!arg->name().empty()) return 0;
     return arg->value()->perform(this);
   }
 
   // Selector_List is converted to a string
-  Value_Ptr To_Value::operator()(Selector_List_Ptr s)
+  Value* To_Value::operator()(Selector_List* s)
   {
-    return SASS_MEMORY_NEW(String_Quoted,
+    return SASS_MEMORY_NEW(mem, String_Quoted,
                            s->pstate(),
                            s->to_string(ctx.c_options));
   }
 
   // Binary_Expression is converted to a string
-  Value_Ptr To_Value::operator()(Binary_Expression_Ptr s)
+  Value* To_Value::operator()(Binary_Expression* s)
   {
-    return SASS_MEMORY_NEW(String_Quoted,
+    return SASS_MEMORY_NEW(mem, String_Quoted,
                            s->pstate(),
                            s->to_string(ctx.c_options));
   }

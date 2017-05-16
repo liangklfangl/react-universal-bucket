@@ -23,7 +23,6 @@ function getHumanPlatform(platform) {
     case 'darwin': return 'OS X';
     case 'freebsd': return 'FreeBSD';
     case 'linux': return 'Linux';
-    case 'linux_musl': return 'Linux/musl';
     case 'win32': return 'Windows';
     default: return false;
   }
@@ -69,7 +68,6 @@ function getHumanNodeVersion(abi) {
     case 47: return 'Node.js 5.x';
     case 48: return 'Node.js 6.x';
     case 51: return 'Node.js 7.x';
-    case 54: return 'Node.js 8.x';
     default: return false;
   }
 }
@@ -173,9 +171,7 @@ function getArgument(name, args) {
  */
 
 function getBinaryName() {
-  var binaryName,
-    variant,
-    platform = process.platform;
+  var binaryName;
 
   if (getArgument('--sass-binary-name')) {
     binaryName = getArgument('--sass-binary-name');
@@ -186,13 +182,8 @@ function getBinaryName() {
   } else if (pkg.nodeSassConfig && pkg.nodeSassConfig.binaryName) {
     binaryName = pkg.nodeSassConfig.binaryName;
   } else {
-    variant = getPlatformVariant();
-    if (variant) {
-      platform += '_' + variant;
-    }
-
     binaryName = [
-      platform, '-',
+      process.platform, '-',
       process.arch, '-',
       process.versions.modules
     ].join('');
@@ -265,7 +256,7 @@ function getBinaryPath() {
   } else if (pkg.nodeSassConfig && pkg.nodeSassConfig.binaryPath) {
     binaryPath = pkg.nodeSassConfig.binaryPath;
   } else {
-    binaryPath = path.join(defaultBinaryPath, getBinaryName().replace(/_(?=binding\.node)/, '/'));
+    binaryPath = path.join(defaultBinaryPath, getBinaryName().replace(/_/, '/'));
   }
 
   return binaryPath;
@@ -366,36 +357,6 @@ function getVersionInfo(binding) {
     ['node-sass', pkg.version, '(Wrapper)', '[JavaScript]'].join('\t'),
     ['libsass  ', binding.libsassVersion(), '(Sass Compiler)', '[C/C++]'].join('\t'),
   ].join(eol);
-}
-
-/**
- * Gets the platform variant, currently either an empty string or 'musl' for Linux/musl platforms.
- *
- * @api public
- */
-
-function getPlatformVariant() {
-  var contents = '';
-
-  if (process.platform !== 'linux') {
-    return '';
-  }
-
-  try {
-    contents = fs.readFileSync(process.execPath);
-
-    // Buffer.indexOf was added in v1.5.0 so cast to string for old node
-    // Delay contents.toStrings because it's expensive
-    if (!contents.indexOf) {
-      contents = contents.toString();
-    }
-
-    if (contents.indexOf('libc.musl-x86_64.so.1') !== -1) {
-      return 'musl';
-    }
-  } catch (err) { } // eslint-disable-line no-empty
-
-  return '';
 }
 
 module.exports.hasBinary = hasBinary;

@@ -2,7 +2,8 @@
  * node-sass: scripts/build.js
  */
 
-var fs = require('fs'),
+var pkg = require('../package.json'),
+  fs = require('fs'),
   mkdir = require('mkdirp'),
   path = require('path'),
   spawn = require('cross-spawn'),
@@ -49,6 +50,74 @@ function afterBuild(options) {
 }
 
 /**
+ * manageProcess
+ *
+ * @param {ChildProcess} proc
+ * @param {Function} cb
+ * @api private
+ */
+
+function manageProcess(proc, cb) {
+  var errorMsg = '';
+  proc.stderr.on('data', function(data) {
+    errorMsg += data.toString();
+  });
+  proc.on('close', function(code) {
+    cb(code === 0 ? null : { message: errorMsg });
+  });
+}
+
+/**
+ * initSubmodules
+ *
+ * @param {Function} cb
+ * @api private
+ */
+
+function initSubmodules(cb) {
+  console.log('Detected a git install');
+  console.log('Cloning LibSass into src/libsass');
+
+  var clone = spawn('git', ['clone', 'https://github.com/sass/libsass.git', './src/libsass']);
+  manageProcess(clone, function(err) {
+    if (err) {
+      cb(err);
+      return;
+    }
+
+    console.log('Checking out LibSass to', pkg.libsass);
+
+    var checkout = spawn('git', ['checkout', pkg.libsass], { cwd: './src/libsass' });
+    manageProcess(checkout, function(err) {
+      cb(err);
+    });
+  });
+}
+
+/**
+ * installGitDependencies
+ *
+ * @param {Function} cb
+ * @api private
+ */
+
+function installGitDependencies(options, cb) {
+  var libsassPath = './src/libsass';
+
+  if (process.env.LIBSASS_EXT || options.libsassExt) {
+    cb();
+  } else if (fs.access) { // node 0.12+, iojs 1.0.0+
+    fs.access(libsassPath, fs.R_OK, function(err) {
+      err && err.code === 'ENOENT' ? initSubmodules(cb) : cb();
+    });
+  } else { // node < 0.12
+    fs.exists(libsassPath, function(exists) {
+      exists ? cb() : initSubmodules(cb);
+    });
+  }
+}
+
+/**
  * Build
  *
  * @param {Object} options
@@ -56,30 +125,37 @@ function afterBuild(options) {
  */
 
 function build(options) {
-  var args = [require.resolve(path.join('node-gyp', 'bin', 'node-gyp.js')), 'rebuild', '--verbose'].concat(
-    ['libsass_ext', 'libsass_cflags', 'libsass_ldflags', 'libsass_library'].map(function(subject) {
-      return ['--', subject, '=', process.env[subject.toUpperCase()] || ''].join('');
-    })).concat(options.args);
-
-  console.log('Building:', [process.execPath].concat(args).join(' '));
-
-  var proc = spawn(process.execPath, args, {
-    stdio: [0, 1, 2]
-  });
-
-  proc.on('exit', function(errorCode) {
-    if (!errorCode) {
-      afterBuild(options);
-      return;
+  installGitDependencies(options, function(err) {
+    if (err) {
+      console.error(err.message);
+      process.exit(1);
     }
 
-    if (errorCode === 127 ) {
-      console.error('node-gyp not found!');
-    } else {
-      console.error('Build failed with error code:', errorCode);
-    }
+    var args = [require.resolve(path.join('node-gyp', 'bin', 'node-gyp.js')), 'rebuild', '--verbose'].concat(
+      ['libsass_ext', 'libsass_cflags', 'libsass_ldflags', 'libsass_library'].map(function(subject) {
+        return ['--', subject, '=', process.env[subject.toUpperCase()] || ''].join('');
+      })).concat(options.args);
 
-    process.exit(1);
+    console.log('Building:', [process.execPath].concat(args).join(' '));
+
+    var proc = spawn(process.execPath, args, {
+      stdio: [0, 1, 2]
+    });
+
+    proc.on('exit', function(errorCode) {
+      if (!errorCode) {
+        afterBuild(options);
+        return;
+      }
+
+      if (errorCode === 127 ) {
+        console.error('node-gyp not found!');
+      } else {
+        console.error('Build failed with error code:', errorCode);
+      }
+
+      process.exit(1);
+    });
   });
 }
 
@@ -93,8 +169,7 @@ function build(options) {
 function parseArgs(args) {
   var options = {
     arch: process.arch,
-    platform: process.platform,
-    force: process.env.npm_config_force === 'true',
+    platform: process.platform
   };
 
   options.args = args.filter(function(arg) {

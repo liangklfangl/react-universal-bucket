@@ -9,22 +9,26 @@
 namespace Sass {
 
 
+    class Context;
+
     class Remove_Placeholders : public Operation_CRTP<void, Remove_Placeholders> {
 
-        void fallback_impl(AST_Node_Ptr n) {}
+        Context&          ctx;
+
+        void fallback_impl(AST_Node* n) {}
 
     public:
-      Selector_List_Ptr remove_placeholders(Selector_List_Ptr);
+      Selector_List* remove_placeholders(Selector_List*);
 
     public:
-        Remove_Placeholders();
+        Remove_Placeholders(Context&);
         ~Remove_Placeholders() { }
 
-        void operator()(Block_Ptr);
-        void operator()(Ruleset_Ptr);
-        void operator()(Media_Block_Ptr);
-        void operator()(Supports_Block_Ptr);
-        void operator()(Directive_Ptr);
+        void operator()(Block*);
+        void operator()(Ruleset*);
+        void operator()(Media_Block*);
+        void operator()(Supports_Block*);
+        void operator()(Directive*);
 
         template <typename U>
         void fallback(U x) { return fallback_impl(x); }

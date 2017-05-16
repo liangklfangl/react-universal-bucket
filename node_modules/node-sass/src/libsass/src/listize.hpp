@@ -11,22 +11,25 @@
 
 namespace Sass {
 
+  typedef Environment<AST_Node*> Env;
   struct Backtrace;
 
-  class Listize : public Operation_CRTP<Expression_Ptr, Listize> {
+  class Listize : public Operation_CRTP<Expression*, Listize> {
 
-    Expression_Ptr fallback_impl(AST_Node_Ptr n);
+    Memory_Manager& mem;
+
+    Expression* fallback_impl(AST_Node* n);
 
   public:
-    Listize();
+    Listize(Memory_Manager&);
     ~Listize() { }
 
-    Expression_Ptr operator()(Selector_List_Ptr);
-    Expression_Ptr operator()(Complex_Selector_Ptr);
-    Expression_Ptr operator()(Compound_Selector_Ptr);
+    Expression* operator()(Selector_List*);
+    Expression* operator()(Complex_Selector*);
+    Expression* operator()(Compound_Selector*);
 
     template <typename U>
-    Expression_Ptr fallback(U x) { return fallback_impl(x); }
+    Expression* fallback(U x) { return fallback_impl(x); }
   };
 
 }

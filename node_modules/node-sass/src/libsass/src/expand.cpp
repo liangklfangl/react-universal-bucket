@@ -2,43 +2,42 @@
 #include <iostream>
 #include <typeinfo>
 
-#include "ast.hpp"
 #include "expand.hpp"
 #include "bind.hpp"
 #include "eval.hpp"
 #include "backtrace.hpp"
 #include "context.hpp"
 #include "parser.hpp"
-#include "sass_functions.hpp"
 
 namespace Sass {
 
-  // simple endless recursion protection
-  const size_t maxRecursion = 500;
-
-  Expand::Expand(Context& ctx, Env* env, Backtrace* bt, std::vector<Selector_List_Obj>* stack)
+  Expand::Expand(Context& ctx, Env* env, Backtrace* bt)
   : ctx(ctx),
     eval(Eval(*this)),
-    recursions(0),
-    in_keyframes(false),
-    at_root_without_rule(false),
-    old_at_root_without_rule(false),
     env_stack(std::vector<Env*>()),
-    block_stack(std::vector<Block_Ptr>()),
-    call_stack(std::vector<AST_Node_Obj>()),
-    selector_stack(std::vector<Selector_List_Obj>()),
-    media_block_stack(std::vector<Media_Block_Ptr>()),
-    backtrace_stack(std::vector<Backtrace*>())
+    block_stack(std::vector<Block*>()),
+    call_stack(std::vector<AST_Node*>()),
+    property_stack(std::vector<String*>()),
+    selector_stack(std::vector<Selector_List*>()),
+    media_block_stack(std::vector<Media_Block*>()),
+    backtrace_stack(std::vector<Backtrace*>()),
+    in_keyframes(false)
   {
     env_stack.push_back(0);
     env_stack.push_back(env);
     block_stack.push_back(0);
     call_stack.push_back(0);
-    if (stack == NULL) { selector_stack.push_back(0); }
-    else { selector_stack.insert(selector_stack.end(), stack->begin(), stack->end()); }
+    // import_stack.push_back(0);
+    property_stack.push_back(0);
+    selector_stack.push_back(0);
     media_block_stack.push_back(0);
     backtrace_stack.push_back(0);
     backtrace_stack.push_back(bt);
+  }
+
+  Context& Expand::context()
+  {
+    return ctx;
   }
 
   Env* Expand::environment()
@@ -48,7 +47,7 @@ namespace Sass {
     return 0;
   }
 
-  Selector_List_Obj Expand::selector()
+  Selector_List* Expand::selector()
   {
     if (selector_stack.size() > 0)
       return selector_stack.back();
@@ -63,13 +62,13 @@ namespace Sass {
   }
 
   // blocks create new variable scopes
-  Block_Ptr Expand::operator()(Block_Ptr b)
+  Statement* Expand::operator()(Block* b)
   {
     // create new local environment
     // set the current env as parent
     Env env(environment());
     // copy the block object (add items later)
-    Block_Obj bb = SASS_MEMORY_NEW(Block,
+    Block* bb = SASS_MEMORY_NEW(ctx.mem, Block,
                                 b->pstate(),
                                 b->length(),
                                 b->is_root());
@@ -77,54 +76,36 @@ namespace Sass {
     this->block_stack.push_back(bb);
     this->env_stack.push_back(&env);
     // operate on block
-    // this may throw up!
     this->append_block(b);
     // revert block and env stack
     this->block_stack.pop_back();
     this->env_stack.pop_back();
     // return copy
-    return bb.detach();
+    return bb;
   }
 
-  Statement_Ptr Expand::operator()(Ruleset_Ptr r)
+  Statement* Expand::operator()(Ruleset* r)
   {
-    LOCAL_FLAG(old_at_root_without_rule, at_root_without_rule);
+    // reset when leaving scope
 
     if (in_keyframes) {
-      Block_Ptr bb = operator()(r->block());
-      Keyframe_Rule_Obj k = SASS_MEMORY_NEW(Keyframe_Rule, r->pstate(), bb);
+      Keyframe_Rule* k = SASS_MEMORY_NEW(ctx.mem, Keyframe_Rule, r->pstate(), r->block()->perform(this)->block());
       if (r->selector()) {
-        if (Selector_List_Ptr s = r->selector()) {
-          selector_stack.push_back(0);
-          k->name(s->eval(eval));
-          selector_stack.pop_back();
-        }
+        selector_stack.push_back(0);
+        k->selector(static_cast<Selector_List*>(r->selector()->perform(&eval)));
+        selector_stack.pop_back();
       }
-      return k.detach();
+      return k;
     }
 
-    // reset when leaving scope
-    LOCAL_FLAG(at_root_without_rule, false);
-
-    // `&` is allowed in `@at-root`!
-    bool has_parent_selector = false;
-    for (size_t i = 0, L = selector_stack.size(); i < L && !has_parent_selector; i++) {
-      Selector_List_Obj ll = selector_stack.at(i);
-      has_parent_selector = ll != 0 && ll->length() > 0;
-    }
-
-    Selector_List_Obj sel = r->selector();
-    if (sel) sel = sel->eval(eval);
-
-    // check for parent selectors in base level rules
+    // do some special checks for the base level rules
     if (r->is_root()) {
-      if (Selector_List_Ptr selector_list = Cast<Selector_List>(r->selector())) {
-        for (Complex_Selector_Obj complex_selector : selector_list->elements()) {
-          Complex_Selector_Ptr tail = complex_selector;
+      if (Selector_List* selector_list = dynamic_cast<Selector_List*>(r->selector())) {
+        for (Complex_Selector* complex_selector : selector_list->elements()) {
+          Complex_Selector* tail = complex_selector;
           while (tail) {
-            if (tail->head()) for (Simple_Selector_Obj header : tail->head()->elements()) {
-              Parent_Selector_Ptr ptr = Cast<Parent_Selector>(header);
-              if (ptr == NULL || (!ptr->real() || has_parent_selector)) continue;
+            if (tail->head()) for (Simple_Selector* header : tail->head()->elements()) {
+              if (dynamic_cast<Parent_Selector*>(header) == NULL) continue; // skip all others
               std::string sel_str(complex_selector->to_string(ctx.c_options));
               error("Base-level rules cannot contain the parent-selector-referencing character '&'.", header->pstate(), backtrace());
             }
@@ -133,100 +114,136 @@ namespace Sass {
         }
       }
     }
-    else {
-      if (sel->length() == 0 || sel->has_parent_ref()) {
-        if (sel->has_real_parent_ref() && !has_parent_selector) {
-          error("Base-level rules cannot contain the parent-selector-referencing character '&'.", sel->pstate(), backtrace());
-        }
+
+    Expression* ex = r->selector()->perform(&eval);
+    Selector_List* sel = dynamic_cast<Selector_List*>(ex);
+    if (sel == 0) throw std::runtime_error("Expanded null selector");
+
+    if (sel->length() == 0 || sel->has_parent_ref()) {
+      bool has_parent_selector = false;
+      for (size_t i = 0, L = selector_stack.size(); i < L && !has_parent_selector; i++) {
+        Selector_List* ll = selector_stack.at(i);
+        has_parent_selector = ll != 0 && ll->length() > 0;
+      }
+      if (!has_parent_selector) {
+        error("Base-level rules cannot contain the parent-selector-referencing character '&'.", sel->pstate(), backtrace());
       }
     }
 
     selector_stack.push_back(sel);
-    Env env(environment());
+    Env* env = 0;
     if (block_stack.back()->is_root()) {
-      env_stack.push_back(&env);
+      env = new Env(environment());
+      env_stack.push_back(env);
     }
     sel->set_media_block(media_block_stack.back());
-    Block_Obj blk = 0;
-    if (r->block()) blk = operator()(r->block());
-    Ruleset_Ptr rr = SASS_MEMORY_NEW(Ruleset,
+    Block* blk = r->block()->perform(this)->block();
+    Ruleset* rr = SASS_MEMORY_NEW(ctx.mem, Ruleset,
                                   r->pstate(),
                                   sel,
                                   blk);
     selector_stack.pop_back();
     if (block_stack.back()->is_root()) {
       env_stack.pop_back();
+      delete env;
     }
-
     rr->is_root(r->is_root());
     rr->tabs(r->tabs());
 
     return rr;
   }
 
-  Statement_Ptr Expand::operator()(Supports_Block_Ptr f)
+  Statement* Expand::operator()(Propset* p)
   {
-    Expression_Obj condition = f->condition()->perform(&eval);
-    Supports_Block_Obj ff = SASS_MEMORY_NEW(Supports_Block,
-                                       f->pstate(),
-                                       Cast<Supports_Condition>(condition),
-                                       operator()(f->block()));
-    return ff.detach();
+    property_stack.push_back(p->property_fragment());
+    Block* expanded_block = p->block()->perform(this)->block();
+
+    for (size_t i = 0, L = expanded_block->length(); i < L; ++i) {
+      Statement* stm = (*expanded_block)[i];
+      if (Declaration* dec = static_cast<Declaration*>(stm)) {
+        String_Schema* combined_prop = SASS_MEMORY_NEW(ctx.mem, String_Schema, p->pstate());
+        if (!property_stack.empty()) {
+          *combined_prop << property_stack.back()->perform(&eval)
+                         << SASS_MEMORY_NEW(ctx.mem, String_Quoted,
+             p->pstate(), "-")
+             << dec->property(); // TODO: eval the prop into a string constant
+        }
+        else {
+          *combined_prop << dec->property();
+        }
+        dec->property(combined_prop);
+        *block_stack.back() << dec;
+      }
+      else if (typeid(*stm) == typeid(Comment)) {
+        // drop comments in propsets
+      }
+      else {
+        error("contents of namespaced properties must result in style declarations only", stm->pstate(), backtrace());
+      }
+    }
+
+    property_stack.pop_back();
+
+    return 0;
   }
 
-  Statement_Ptr Expand::operator()(Media_Block_Ptr m)
+  Statement* Expand::operator()(Supports_Block* f)
+  {
+    Expression* condition = f->condition()->perform(&eval);
+    Supports_Block* ff = SASS_MEMORY_NEW(ctx.mem, Supports_Block,
+                                       f->pstate(),
+                                       static_cast<Supports_Condition*>(condition),
+                                       f->block()->perform(this)->block());
+    return ff;
+  }
+
+  Statement* Expand::operator()(Media_Block* m)
   {
     media_block_stack.push_back(m);
-    Expression_Obj mq = m->media_queries()->perform(&eval);
+    Expression* mq = m->media_queries()->perform(&eval);
     std::string str_mq(mq->to_string(ctx.c_options));
     char* str = sass_copy_c_string(str_mq.c_str());
     ctx.strings.push_back(str);
     Parser p(Parser::from_c_str(str, ctx, mq->pstate()));
-    mq = p.parse_media_queries(); // re-assign now
-    List_Obj ls = Cast<List>(mq->perform(&eval));
-    Block_Obj blk = operator()(m->block());
-    Media_Block_Ptr mm = SASS_MEMORY_NEW(Media_Block,
+    mq = p.parse_media_queries();
+    Media_Block* mm = SASS_MEMORY_NEW(ctx.mem, Media_Block,
                                       m->pstate(),
-                                      ls,
-                                      blk);
+                                      static_cast<List*>(mq->perform(&eval)),
+                                      m->block()->perform(this)->block(),
+                                      0);
     media_block_stack.pop_back();
     mm->tabs(m->tabs());
     return mm;
   }
 
-  Statement_Ptr Expand::operator()(At_Root_Block_Ptr a)
+  Statement* Expand::operator()(At_Root_Block* a)
   {
-    Block_Obj ab = a->block();
-    Expression_Obj ae = a->expression();
-
+    Block* ab = a->block();
+    // if (ab) ab->is_root(true);
+    Expression* ae = a->expression();
     if (ae) ae = ae->perform(&eval);
-    else ae = SASS_MEMORY_NEW(At_Root_Query, a->pstate());
-
-    LOCAL_FLAG(at_root_without_rule, true);
-    LOCAL_FLAG(in_keyframes, false);
-
-                                       ;
-
-    Block_Obj bb = ab ? operator()(ab) : NULL;
-    At_Root_Block_Obj aa = SASS_MEMORY_NEW(At_Root_Block,
+    else ae = SASS_MEMORY_NEW(ctx.mem, At_Root_Query, a->pstate());
+    Block* bb = ab ? ab->perform(this)->block() : 0;
+    At_Root_Block* aa = SASS_MEMORY_NEW(ctx.mem, At_Root_Block,
                                         a->pstate(),
                                         bb,
-                                        Cast<At_Root_Query>(ae));
-    return aa.detach();
+                                        static_cast<At_Root_Query*>(ae));
+    // aa->block()->is_root(true);
+    return aa;
   }
 
-  Statement_Ptr Expand::operator()(Directive_Ptr a)
+  Statement* Expand::operator()(Directive* a)
   {
     LOCAL_FLAG(in_keyframes, a->is_keyframes());
-    Block_Ptr ab = a->block();
-    Selector_List_Ptr as = a->selector();
-    Expression_Ptr av = a->value();
+    Block* ab = a->block();
+    Selector* as = a->selector();
+    Expression* av = a->value();
     selector_stack.push_back(0);
     if (av) av = av->perform(&eval);
-    if (as) as = eval(as);
+    if (as) as = dynamic_cast<Selector*>(as->perform(&eval));
     selector_stack.pop_back();
-    Block_Ptr bb = ab ? operator()(ab) : NULL;
-    Directive_Ptr aa = SASS_MEMORY_NEW(Directive,
+    Block* bb = ab ? ab->perform(this)->block() : 0;
+    Directive* aa = SASS_MEMORY_NEW(ctx.mem, Directive,
                                   a->pstate(),
                                   a->keyword(),
                                   as,
@@ -235,40 +252,29 @@ namespace Sass {
     return aa;
   }
 
-  Statement_Ptr Expand::operator()(Declaration_Ptr d)
+  Statement* Expand::operator()(Declaration* d)
   {
-    Block_Obj ab = d->block();
-    String_Obj old_p = d->property();
-    Expression_Obj prop = old_p->perform(&eval);
-    String_Obj new_p = Cast<String>(prop);
-    // we might get a color back
-    if (!new_p) {
-      std::string str(prop->to_string(ctx.c_options));
-      new_p = SASS_MEMORY_NEW(String_Constant, old_p->pstate(), str);
-    }
-    Expression_Obj value = d->value()->perform(&eval);
-    Block_Obj bb = ab ? operator()(ab) : NULL;
-    if (!bb) {
-      if (!value || (value->is_invisible() && !d->is_important())) return 0;
-    }
-    Declaration_Ptr decl = SASS_MEMORY_NEW(Declaration,
+    String* old_p = d->property();
+    String* new_p = static_cast<String*>(old_p->perform(&eval));
+    Expression* value = d->value()->perform(&eval);
+    if (!value || (value->is_invisible() && !d->is_important())) return 0;
+    Declaration* decl = SASS_MEMORY_NEW(ctx.mem, Declaration,
                                         d->pstate(),
                                         new_p,
                                         value,
-                                        d->is_important(),
-                                        bb);
+                                        d->is_important());
     decl->tabs(d->tabs());
     return decl;
   }
 
-  Statement_Ptr Expand::operator()(Assignment_Ptr a)
+  Statement* Expand::operator()(Assignment* a)
   {
     Env* env = environment();
     std::string var(a->variable());
     if (a->is_global()) {
       if (a->is_default()) {
         if (env->has_global(var)) {
-          Expression_Obj e = Cast<Expression>(env->get_global(var));
+          Expression* e = dynamic_cast<Expression*>(env->get_global(var));
           if (!e || e->concrete_type() == Expression::NULL_VAL) {
             env->set_global(var, a->value()->perform(&eval));
           }
@@ -286,8 +292,8 @@ namespace Sass {
         auto cur = env;
         while (cur && cur->is_lexical()) {
           if (cur->has_local(var)) {
-            if (AST_Node_Obj node = cur->get_local(var)) {
-              Expression_Obj e = Cast<Expression>(node);
+            if (AST_Node* node = cur->get_local(var)) {
+              Expression* e = dynamic_cast<Expression*>(node);
               if (!e || e->concrete_type() == Expression::NULL_VAL) {
                 cur->set_local(var, a->value()->perform(&eval));
               }
@@ -302,8 +308,8 @@ namespace Sass {
         throw std::runtime_error("Env not in sync");
       }
       else if (env->has_global(var)) {
-        if (AST_Node_Obj node = env->get_global(var)) {
-          Expression_Obj e = Cast<Expression>(node);
+        if (AST_Node* node = env->get_global(var)) {
+          Expression* e = dynamic_cast<Expression*>(node);
           if (!e || e->concrete_type() == Expression::NULL_VAL) {
             env->set_global(var, a->value()->perform(&eval));
           }
@@ -322,26 +328,26 @@ namespace Sass {
     return 0;
   }
 
-  Statement_Ptr Expand::operator()(Import_Ptr imp)
+  Statement* Expand::operator()(Import* imp)
   {
-    Import_Obj result = SASS_MEMORY_NEW(Import, imp->pstate());
-    if (imp->import_queries() && imp->import_queries()->size()) {
-      Expression_Obj ex = imp->import_queries()->perform(&eval);
-      result->import_queries(Cast<List>(ex));
+    Import* result = SASS_MEMORY_NEW(ctx.mem, Import, imp->pstate());
+    if (imp->media_queries() && imp->media_queries()->size()) {
+      Expression* ex = imp->media_queries()->perform(&eval);
+      result->media_queries(dynamic_cast<List*>(ex));
     }
     for ( size_t i = 0, S = imp->urls().size(); i < S; ++i) {
       result->urls().push_back(imp->urls()[i]->perform(&eval));
     }
     // all resources have been dropped for Input_Stubs
     // for ( size_t i = 0, S = imp->incs().size(); i < S; ++i) {}
-    return result.detach();
+    return result;
   }
 
-  Statement_Ptr Expand::operator()(Import_Stub_Ptr i)
+  Statement* Expand::operator()(Import_Stub* i)
   {
     // get parent node from call stack
-    AST_Node_Obj parent = call_stack.back();
-    if (Cast<Block>(parent) == NULL) {
+    AST_Node* parent = call_stack.back();
+    if (parent && dynamic_cast<Block*>(parent) == NULL) {
       error("Import directives may not be used within control directives or mixins.", i->pstate());
     }
     // we don't seem to need that actually afterall
@@ -358,47 +364,46 @@ namespace Sass {
     return 0;
   }
 
-  Statement_Ptr Expand::operator()(Warning_Ptr w)
+  Statement* Expand::operator()(Warning* w)
   {
     // eval handles this too, because warnings may occur in functions
     w->perform(&eval);
     return 0;
   }
 
-  Statement_Ptr Expand::operator()(Error_Ptr e)
+  Statement* Expand::operator()(Error* e)
   {
     // eval handles this too, because errors may occur in functions
     e->perform(&eval);
     return 0;
   }
 
-  Statement_Ptr Expand::operator()(Debug_Ptr d)
+  Statement* Expand::operator()(Debug* d)
   {
     // eval handles this too, because warnings may occur in functions
     d->perform(&eval);
     return 0;
   }
 
-  Statement_Ptr Expand::operator()(Comment_Ptr c)
+  Statement* Expand::operator()(Comment* c)
   {
     eval.is_in_comment = true;
-    Comment_Ptr rv = SASS_MEMORY_NEW(Comment, c->pstate(), Cast<String>(c->text()->perform(&eval)), c->is_important());
+    auto rv = SASS_MEMORY_NEW(ctx.mem, Comment, c->pstate(), static_cast<String*>(c->text()->perform(&eval)), c->is_important());
     eval.is_in_comment = false;
     // TODO: eval the text, once we're parsing/storing it as a String_Schema
     return rv;
   }
 
-  Statement_Ptr Expand::operator()(If_Ptr i)
+  Statement* Expand::operator()(If* i)
   {
     Env env(environment(), true);
     env_stack.push_back(&env);
     call_stack.push_back(i);
-    Expression_Obj rv = i->predicate()->perform(&eval);
-    if (*rv) {
+    if (*i->predicate()->perform(&eval)) {
       append_block(i->block());
     }
     else {
-      Block_Ptr alt = i->alternative();
+      Block* alt = i->alternative();
       if (alt) append_block(alt);
     }
     call_stack.pop_back();
@@ -408,19 +413,19 @@ namespace Sass {
 
   // For does not create a new env scope
   // But iteration vars are reset afterwards
-  Statement_Ptr Expand::operator()(For_Ptr f)
+  Statement* Expand::operator()(For* f)
   {
     std::string variable(f->variable());
-    Expression_Obj low = f->lower_bound()->perform(&eval);
+    Expression* low = f->lower_bound()->perform(&eval);
     if (low->concrete_type() != Expression::NUMBER) {
       throw Exception::TypeMismatch(*low, "integer");
     }
-    Expression_Obj high = f->upper_bound()->perform(&eval);
+    Expression* high = f->upper_bound()->perform(&eval);
     if (high->concrete_type() != Expression::NUMBER) {
       throw Exception::TypeMismatch(*high, "integer");
     }
-    Number_Obj sass_start = Cast<Number>(low);
-    Number_Obj sass_end = Cast<Number>(high);
+    Number* sass_start = static_cast<Number*>(low);
+    Number* sass_end = static_cast<Number*>(high);
     // check if units are valid for sequence
     if (sass_start->unit() != sass_end->unit()) {
       std::stringstream msg; msg << "Incompatible units: '"
@@ -434,15 +439,14 @@ namespace Sass {
     Env env(environment(), true);
     env_stack.push_back(&env);
     call_stack.push_back(f);
-    Number_Obj it = SASS_MEMORY_NEW(Number, low->pstate(), start, sass_end->unit());
+    Number* it = SASS_MEMORY_NEW(env.mem, Number, low->pstate(), start, sass_end->unit());
     env.set_local(variable, it);
-    Block_Ptr body = f->block();
+    Block* body = f->block();
     if (start < end) {
       if (f->is_inclusive()) ++end;
       for (double i = start;
            i < end;
            ++i) {
-        it = SASS_MEMORY_COPY(it);
         it->value(i);
         env.set_local(variable, it);
         append_block(body);
@@ -452,7 +456,6 @@ namespace Sass {
       for (double i = start;
            i > end;
            --i) {
-        it = SASS_MEMORY_COPY(it);
         it->value(i);
         env.set_local(variable, it);
         append_block(body);
@@ -465,42 +468,41 @@ namespace Sass {
 
   // Eval does not create a new env scope
   // But iteration vars are reset afterwards
-  Statement_Ptr Expand::operator()(Each_Ptr e)
+  Statement* Expand::operator()(Each* e)
   {
     std::vector<std::string> variables(e->variables());
-    Expression_Obj expr = e->list()->perform(&eval);
-    List_Obj list = 0;
-    Map_Obj map;
+    Expression* expr = e->list()->perform(&eval);
+    Vectorized<Expression*>* list = 0;
+    Map* map = 0;
     if (expr->concrete_type() == Expression::MAP) {
-      map = Cast<Map>(expr);
+      map = static_cast<Map*>(expr);
     }
-    else if (Selector_List_Ptr ls = Cast<Selector_List>(expr)) {
-      Listize listize;
-      Expression_Obj rv = ls->perform(&listize);
-      list = Cast<List>(rv);
+    else if (Selector_List* ls = dynamic_cast<Selector_List*>(expr)) {
+      Listize listize(ctx.mem);
+      list = dynamic_cast<List*>(ls->perform(&listize));
     }
     else if (expr->concrete_type() != Expression::LIST) {
-      list = SASS_MEMORY_NEW(List, expr->pstate(), 1, SASS_COMMA);
-      list->append(expr);
+      list = SASS_MEMORY_NEW(ctx.mem, List, expr->pstate(), 1, SASS_COMMA);
+      *list << expr;
     }
     else {
-      list = Cast<List>(expr);
+      list = static_cast<List*>(expr);
     }
     // remember variables and then reset them
     Env env(environment(), true);
     env_stack.push_back(&env);
     call_stack.push_back(e);
-    Block_Ptr body = e->block();
+    Block* body = e->block();
 
     if (map) {
       for (auto key : map->keys()) {
-        Expression_Obj k = key->perform(&eval);
-        Expression_Obj v = map->at(key)->perform(&eval);
+        Expression* k = key->perform(&eval);
+        Expression* v = map->at(key)->perform(&eval);
 
         if (variables.size() == 1) {
-          List_Obj variable = SASS_MEMORY_NEW(List, map->pstate(), 2, SASS_SPACE);
-          variable->append(k);
-          variable->append(v);
+          List* variable = SASS_MEMORY_NEW(ctx.mem, List, map->pstate(), 2, SASS_SPACE);
+          *variable << k;
+          *variable << v;
           env.set_local(variables[0], variable);
         } else {
           env.set_local(variables[0], k);
@@ -511,32 +513,32 @@ namespace Sass {
     }
     else {
       // bool arglist = list->is_arglist();
-      if (list->length() == 1 && Cast<Selector_List>(list)) {
-        list = Cast<List>(list);
+      if (list->length() == 1 && dynamic_cast<Selector_List*>(list)) {
+        list = dynamic_cast<Vectorized<Expression*>*>(list);
       }
       for (size_t i = 0, L = list->length(); i < L; ++i) {
-        Expression_Obj e = list->at(i);
+        Expression* e = (*list)[i];
         // unwrap value if the expression is an argument
-        if (Argument_Obj arg = Cast<Argument>(e)) e = arg->value();
+        if (Argument* arg = dynamic_cast<Argument*>(e)) e = arg->value();
         // check if we got passed a list of args (investigate)
-        if (List_Obj scalars = Cast<List>(e)) {
+        if (List* scalars = dynamic_cast<List*>(e)) {
           if (variables.size() == 1) {
-            List_Obj var = scalars;
+            Expression* var = scalars;
             // if (arglist) var = (*scalars)[0];
             env.set_local(variables[0], var);
           } else {
             for (size_t j = 0, K = variables.size(); j < K; ++j) {
-              Expression_Obj res = j >= scalars->length()
-                ? SASS_MEMORY_NEW(Null, expr->pstate())
+              Expression* res = j >= scalars->length()
+                ? SASS_MEMORY_NEW(ctx.mem, Null, expr->pstate())
                 : (*scalars)[j]->perform(&eval);
               env.set_local(variables[j], res);
             }
           }
         } else {
           if (variables.size() > 0) {
-            env.set_local(variables.at(0), e);
+            env.set_local(variables[0], e);
             for (size_t j = 1, K = variables.size(); j < K; ++j) {
-              Expression_Obj res = SASS_MEMORY_NEW(Null, expr->pstate());
+              Expression* res = SASS_MEMORY_NEW(ctx.mem, Null, expr->pstate());
               env.set_local(variables[j], res);
             }
           }
@@ -549,38 +551,36 @@ namespace Sass {
     return 0;
   }
 
-  Statement_Ptr Expand::operator()(While_Ptr w)
+  Statement* Expand::operator()(While* w)
   {
-    Expression_Obj pred = w->predicate();
-    Block_Ptr body = w->block();
+    Expression* pred = w->predicate();
+    Block* body = w->block();
     Env env(environment(), true);
     env_stack.push_back(&env);
     call_stack.push_back(w);
-    Expression_Obj cond = pred->perform(&eval);
-    while (!cond->is_false()) {
+    while (*pred->perform(&eval)) {
       append_block(body);
-      cond = pred->perform(&eval);
     }
     call_stack.pop_back();
     env_stack.pop_back();
     return 0;
   }
 
-  Statement_Ptr Expand::operator()(Return_Ptr r)
+  Statement* Expand::operator()(Return* r)
   {
     error("@return may only be used within a function", r->pstate(), backtrace());
     return 0;
   }
 
 
-  void Expand::expand_selector_list(Selector_Obj s, Selector_List_Obj extender) {
+  void Expand::expand_selector_list(Selector* s, Selector_List* extender) {
 
-    if (Selector_List_Obj sl = Cast<Selector_List>(s)) {
-      for (Complex_Selector_Obj complex_selector : sl->elements()) {
-        Complex_Selector_Obj tail = complex_selector;
+    if (Selector_List* sl = dynamic_cast<Selector_List*>(s)) {
+      for (Complex_Selector* complex_selector : sl->elements()) {
+        Complex_Selector* tail = complex_selector;
         while (tail) {
-          if (tail->head()) for (Simple_Selector_Obj header : tail->head()->elements()) {
-            if (Cast<Parent_Selector>(header) == NULL) continue; // skip all others
+          if (tail->head()) for (Simple_Selector* header : tail->head()->elements()) {
+            if (dynamic_cast<Parent_Selector*>(header) == NULL) continue; // skip all others
             std::string sel_str(complex_selector->to_string(ctx.c_options));
             error("Can't extend " + sel_str + ": can't extend parent selectors", header->pstate(), backtrace());
           }
@@ -590,75 +590,65 @@ namespace Sass {
     }
 
 
-    Selector_List_Obj contextualized = Cast<Selector_List>(s->perform(&eval));
-    if (contextualized == false) return;
+    Selector_List* contextualized = dynamic_cast<Selector_List*>(s->perform(&eval));
+    if (contextualized == NULL) return;
     for (auto complex_sel : contextualized->elements()) {
-      Complex_Selector_Obj c = complex_sel;
+      Complex_Selector* c = complex_sel;
       if (!c->head() || c->tail()) {
         std::string sel_str(contextualized->to_string(ctx.c_options));
         error("Can't extend " + sel_str + ": can't extend nested selectors", c->pstate(), backtrace());
       }
-      Compound_Selector_Obj placeholder = c->head();
+      Compound_Selector* placeholder = c->head();
       if (contextualized->is_optional()) placeholder->is_optional(true);
       for (size_t i = 0, L = extender->length(); i < L; ++i) {
-        Complex_Selector_Obj sel = (*extender)[i];
+        Complex_Selector* sel = (*extender)[i];
         if (!(sel->head() && sel->head()->length() > 0 &&
-            Cast<Parent_Selector>((*sel->head())[0])))
+            dynamic_cast<Parent_Selector*>((*sel->head())[0])))
         {
-          Compound_Selector_Obj hh = SASS_MEMORY_NEW(Compound_Selector, (*extender)[i]->pstate());
+          Compound_Selector* hh = SASS_MEMORY_NEW(ctx.mem, Compound_Selector, (*extender)[i]->pstate());
           hh->media_block((*extender)[i]->media_block());
-          Complex_Selector_Obj ssel = SASS_MEMORY_NEW(Complex_Selector, (*extender)[i]->pstate());
+          Complex_Selector* ssel = SASS_MEMORY_NEW(ctx.mem, Complex_Selector, (*extender)[i]->pstate());
           ssel->media_block((*extender)[i]->media_block());
           if (sel->has_line_feed()) ssel->has_line_feed(true);
-          Parent_Selector_Obj ps = SASS_MEMORY_NEW(Parent_Selector, (*extender)[i]->pstate());
+          Parent_Selector* ps = SASS_MEMORY_NEW(ctx.mem, Parent_Selector, (*extender)[i]->pstate());
           ps->media_block((*extender)[i]->media_block());
-          hh->append(ps);
+          *hh << ps;
           ssel->tail(sel);
           ssel->head(hh);
           sel = ssel;
         }
         // if (c->has_line_feed()) sel->has_line_feed(true);
-        ctx.subset_map.put(placeholder, std::make_pair(sel, placeholder));
+        ctx.subset_map.put(placeholder->to_str_vec(), std::make_pair(sel, placeholder));
       }
     }
 
   }
 
-  Statement* Expand::operator()(Extension_Ptr e)
+  Statement* Expand::operator()(Extension* e)
   {
-    if (Selector_List_Ptr extender = selector()) {
-      Selector_List_Ptr sl = e->selector();
-      // abort on invalid selector
-      if (sl == NULL) return NULL;
-      if (Selector_Schema_Ptr schema = sl->schema()) {
-        if (schema->has_real_parent_ref()) {
-          // put root block on stack again (ignore parents)
-          // selector schema must not connect in eval!
-          block_stack.push_back(block_stack.at(1));
-          sl = eval(sl->schema());
-          block_stack.pop_back();
-        } else {
-          selector_stack.push_back(0);
-          sl = eval(sl->schema());
-          selector_stack.pop_back();
-        }
+    if (Selector_List* extender = dynamic_cast<Selector_List*>(selector())) {
+      Selector* s = e->selector();
+      if (Selector_Schema* schema = dynamic_cast<Selector_Schema*>(s)) {
+        if (schema->has_parent_ref()) s = eval(schema);
       }
-      for (Complex_Selector_Obj cs : sl->elements()) {
-        if (!cs.isNull() && !cs->head().isNull()) {
-          cs->head()->media_block(media_block_stack.back());
+      if (Selector_List* sl = dynamic_cast<Selector_List*>(s)) {
+        for (Complex_Selector* cs : *sl) {
+          if (cs != NULL && cs->head() != NULL) {
+            cs->head()->media_block(media_block_stack.back());
+          }
         }
       }
       selector_stack.push_back(0);
-      expand_selector_list(sl, extender);
+      expand_selector_list(s, extender);
       selector_stack.pop_back();
     }
     return 0;
   }
 
-  Statement_Ptr Expand::operator()(Definition_Ptr d)
+  Statement* Expand::operator()(Definition* d)
   {
     Env* env = environment();
-    Definition_Obj dd = SASS_MEMORY_COPY(d);
+    Definition* dd = SASS_MEMORY_NEW(ctx.mem, Definition, *d);
     env->local_frame()[d->name() +
                         (d->type() == Definition::MIXIN ? "[m]" : "[f]")] = dd;
 
@@ -675,53 +665,38 @@ namespace Sass {
       );
     }
 
+
     // set the static link so we can have lexical scoping
     dd->environment(env);
     return 0;
   }
 
-  Statement_Ptr Expand::operator()(Mixin_Call_Ptr c)
+  Statement* Expand::operator()(Mixin_Call* c)
   {
-
-    if (recursions > maxRecursion) {
-      throw Exception::StackError(*c);
-    }
-
-    recursions ++;
-
     Env* env = environment();
     std::string full_name(c->name() + "[m]");
     if (!env->has(full_name)) {
       error("no mixin named " + c->name(), c->pstate(), backtrace());
     }
-    Definition_Obj def = Cast<Definition>((*env)[full_name]);
-    Block_Obj body = def->block();
-    Parameters_Obj params = def->parameters();
+    Definition* def = static_cast<Definition*>((*env)[full_name]);
+    Block* body = def->block();
+    Parameters* params = def->parameters();
 
     if (c->block() && c->name() != "@content" && !body->has_content()) {
       error("Mixin \"" + c->name() + "\" does not accept a content block.", c->pstate(), backtrace());
     }
-    Expression_Obj rv = c->arguments()->perform(&eval);
-    Arguments_Obj args = Cast<Arguments>(rv);
+    Arguments* args = static_cast<Arguments*>(c->arguments()
+                                               ->perform(&eval));
     Backtrace new_bt(backtrace(), c->pstate(), ", in mixin `" + c->name() + "`");
     backtrace_stack.push_back(&new_bt);
-    ctx.callee_stack.push_back({
-      c->name().c_str(),
-      c->pstate().path,
-      c->pstate().line + 1,
-      c->pstate().column + 1,
-      SASS_CALLEE_MIXIN,
-      { env }
-    });
-
     Env new_env(def->environment());
     env_stack.push_back(&new_env);
     if (c->block()) {
       // represent mixin content blocks as thunks/closures
-      Definition_Obj thunk = SASS_MEMORY_NEW(Definition,
+      Definition* thunk = SASS_MEMORY_NEW(ctx.mem, Definition,
                                           c->pstate(),
                                           "@content",
-                                          SASS_MEMORY_NEW(Parameters, c->pstate()),
+                                          SASS_MEMORY_NEW(ctx.mem, Parameters, c->pstate()),
                                           c->block(),
                                           Definition::MIXIN);
       thunk->environment(env);
@@ -729,67 +704,47 @@ namespace Sass {
     }
 
     bind(std::string("Mixin"), c->name(), params, args, &ctx, &new_env, &eval);
-
-    Block_Obj trace_block = SASS_MEMORY_NEW(Block, c->pstate());
-    Trace_Obj trace = SASS_MEMORY_NEW(Trace, c->pstate(), c->name(), trace_block);
-
-
-    block_stack.push_back(trace_block);
-    for (auto bb : body->elements()) {
-      Statement_Obj ith = bb->perform(this);
-      if (ith) trace->block()->append(ith);
-    }
-    block_stack.pop_back();
-
-    env_stack.pop_back();
+    append_block(body);
     backtrace_stack.pop_back();
-    ctx.callee_stack.pop_back();
-
-    recursions --;
-    return trace.detach();
+    env_stack.pop_back();
+    return 0;
   }
 
-  Statement_Ptr Expand::operator()(Content_Ptr c)
+  Statement* Expand::operator()(Content* c)
   {
     Env* env = environment();
     // convert @content directives into mixin calls to the underlying thunk
     if (!env->has("@content[m]")) return 0;
-
     if (block_stack.back()->is_root()) {
       selector_stack.push_back(0);
     }
-
-    Mixin_Call_Obj call = SASS_MEMORY_NEW(Mixin_Call,
+    Mixin_Call* call = SASS_MEMORY_NEW(ctx.mem, Mixin_Call,
                                        c->pstate(),
                                        "@content",
-                                       SASS_MEMORY_NEW(Arguments, c->pstate()));
-
-    Trace_Obj trace = Cast<Trace>(call->perform(this));
-
+                                       SASS_MEMORY_NEW(ctx.mem, Arguments, c->pstate()));
+    Statement* stm = call->perform(this);
     if (block_stack.back()->is_root()) {
       selector_stack.pop_back();
     }
-
-    return trace.detach();
+    return stm;
   }
 
   // produce an error if something is not implemented
-  inline Statement_Ptr Expand::fallback_impl(AST_Node_Ptr n)
+  inline Statement* Expand::fallback_impl(AST_Node* n)
   {
     std::string err =std:: string("`Expand` doesn't handle ") + typeid(*n).name();
-    String_Quoted_Obj msg = SASS_MEMORY_NEW(String_Quoted, ParserState("[WARN]"), err);
+    String_Quoted* msg = SASS_MEMORY_NEW(ctx.mem, String_Quoted, ParserState("[WARN]"), err);
     error("unknown internal error; please contact the LibSass maintainers", n->pstate(), backtrace());
-    return SASS_MEMORY_NEW(Warning, ParserState("[WARN]"), msg);
+    return SASS_MEMORY_NEW(ctx.mem, Warning, ParserState("[WARN]"), msg);
   }
 
   // process and add to last block on stack
-  inline void Expand::append_block(Block_Ptr b)
+  inline void Expand::append_block(Block* b)
   {
     if (b->is_root()) call_stack.push_back(b);
     for (size_t i = 0, L = b->length(); i < L; ++i) {
-      Statement_Ptr stm = b->at(i);
-      Statement_Obj ith = stm->perform(this);
-      if (ith) block_stack.back()->append(ith);
+      Statement* ith = (*b)[i]->perform(this);
+      if (ith) *block_stack.back() << ith;
     }
     if (b->is_root()) call_stack.pop_back();
   }

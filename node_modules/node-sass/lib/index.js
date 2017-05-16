@@ -171,11 +171,6 @@ function buildIncludePaths(options) {
     );
   }
 
-  // Preserve the behaviour people have come to expect.
-  // This behaviour was removed from Sass in 3.4 and
-  // LibSass in 3.5.
-  options.includePaths.unshift(process.cwd());
-
   return options.includePaths.join(path.delimiter);
 }
 

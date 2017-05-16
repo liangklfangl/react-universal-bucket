@@ -1,23 +1,35 @@
+/**
+ * Bootstrap configuration for bootstrap-sass-loader
+ * 安装bootstrap-sass的时候必须安装ootstrap-sass-loader，这个文件就是给bootstrap-sass-loader
+ * 而且如果为了不引入jquery，我们
+ * Scripts are disabled to not load jQuery.
+ * If you depend on Bootstrap scripts consider react-bootstrap instead.
+ * https://github.com/react-bootstrap/react-bootstrap
+ *
+ * In order to keep the bundle size low in production
+ * disable components you don't use.
+ *
+ */
+const path = require("path");
 module.exports = {
-  preBootstrapCustomizations: './variables.less',
-  // preBootstrapCustomizations
-  // 在我们导入bootstrap变量之前设置我们自己的变量,少使用bootstrapCustomizations
+  preBootstrapCustomizations: path.join(__dirname,'./variables.scss'),
   verbose: false,
   debug: false,
-  scripts: {
-    transition: false,
-    alert: false,
-    button: false,
-    carousel: false,
-    collapse: false,
-    dropdown: false,
-    modal: false,
-    tooltip: false,
-    popover: false,
-    scrollspy: false,
-    tab: false,
-    affix: false
-  },
+  scripts:false,
+  // scripts: {
+  //   transition: false,
+  //   alert: false,
+  //   button: false,
+  //   carousel: false,
+  //   collapse: false,
+  //   dropdown: false,
+  //   modal: false,
+  //   tooltip: false,
+  //   popover: false,
+  //   scrollspy: false,
+  //   tab: false,
+  //   affix: false
+  // },
   styles: {
     mixins: true,
     normalize: true,

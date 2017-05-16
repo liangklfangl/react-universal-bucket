@@ -21,7 +21,7 @@ namespace Sass {
     { }
 
 
-    InvalidParent::InvalidParent(Selector_Ptr parent, Selector_Ptr selector)
+    InvalidParent::InvalidParent(Selector* parent, Selector* selector)
     : Base(selector->pstate()), parent(parent), selector(selector)
     {
       msg = "Invalid parent selector for \"";
@@ -31,28 +31,20 @@ namespace Sass {
       msg += "\"";
     }
 
-    InvalidArgumentType::InvalidArgumentType(ParserState pstate, std::string fn, std::string arg, std::string type, const Value_Ptr value)
+    InvalidArgumentType::InvalidArgumentType(ParserState pstate, std::string fn, std::string arg, std::string type, const Value* value)
     : Base(pstate), fn(fn), arg(arg), type(type), value(value)
     {
       msg  = arg + ": \"";
-      if (value) msg += value->to_string(Sass_Inspect_Options());
+      msg += value->to_string(Sass_Inspect_Options());
       msg += "\" is not a " + type;
       msg += " for `" + fn + "'";
-    }
-
-    MissingArgument::MissingArgument(ParserState pstate, std::string fn, std::string arg, std::string fntype)
-    : Base(pstate), fn(fn), arg(arg), fntype(fntype)
-    {
-      msg  = fntype + " " + fn;
-      msg += " is missing argument ";
-      msg += arg + ".";
     }
 
     InvalidSyntax::InvalidSyntax(ParserState pstate, std::string msg, std::vector<Sass_Import_Entry>* import_stack)
     : Base(pstate, msg, import_stack)
     { }
 
-    UndefinedOperation::UndefinedOperation(Expression_Ptr_Const lhs, Expression_Ptr_Const rhs, const std::string& op)
+    UndefinedOperation::UndefinedOperation(const Expression* lhs, const Expression* rhs, const std::string& op)
     : lhs(lhs), rhs(rhs), op(op)
     {
       msg  = def_op_msg + ": \"";
@@ -62,7 +54,7 @@ namespace Sass {
       msg += "\".";
     }
 
-    InvalidNullOperation::InvalidNullOperation(Expression_Ptr_Const lhs, Expression_Ptr_Const rhs, const std::string& op)
+    InvalidNullOperation::InvalidNullOperation(const Expression* lhs, const Expression* rhs, const std::string& op)
     : UndefinedOperation(lhs, rhs, op)
     {
       msg  = def_op_null_msg + ": \"";
@@ -82,6 +74,7 @@ namespace Sass {
     : Base(org.pstate()), dup(dup), org(org)
     {
       msg  = "Duplicate key ";
+      dup.get_duplicate_key()->is_delayed(false);
       msg += dup.get_duplicate_key()->inspect();
       msg += " in map (";
       msg += org.inspect();
@@ -104,12 +97,6 @@ namespace Sass {
       msg += " isn't a valid CSS value.";
     }
 
-    StackError::StackError(const AST_Node& node)
-    : Base(node.pstate()), node(node)
-    {
-      msg  = "stack level too deep";
-    }
-
     IncompatibleUnits::IncompatibleUnits(const Number& lhs, const Number& rhs)
     : lhs(lhs), rhs(rhs)
     {
@@ -120,7 +107,7 @@ namespace Sass {
       msg += "'.";
     }
 
-    AlphaChannelsNotEqual::AlphaChannelsNotEqual(Expression_Ptr_Const lhs, Expression_Ptr_Const rhs, const std::string& op)
+    AlphaChannelsNotEqual::AlphaChannelsNotEqual(const Expression* lhs, const Expression* rhs, const std::string& op)
     : lhs(lhs), rhs(rhs), op(op)
     {
       msg  = "Alpha channels must be equal: ";

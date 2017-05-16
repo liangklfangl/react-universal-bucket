@@ -1,7 +1,9 @@
-const loader = require('extract-text-webpack-plugin').extract({ 
+const path = require("path");
+const bootstrapConfig = require('./bootstrap.config.js');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+bootstrapConfig.styleLoader = ExtractTextPlugin.extract({ 
 	fallback: 'style-loader', 
-	use: 'css-loader?sourceMap!less-loader?sourceMap'
-})
-
-bootstrapConfig.styleLoader=loader;
+	use: 'css-loader?sourceMap!sass-loader?sourceMap'
+});
 module.exports = bootstrapConfig;
+

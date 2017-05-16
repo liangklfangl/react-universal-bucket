@@ -2,7 +2,6 @@
 #define SASS_EXTEND_H
 
 #include <string>
-#include <set>
 
 #include "ast.hpp"
 #include "operation.hpp"
@@ -13,34 +12,30 @@ namespace Sass {
   class Context;
   class Node;
 
+  typedef Subset_Map<std::string, std::pair<Complex_Selector*, Compound_Selector*> > ExtensionSubsetMap;
+
   class Extend : public Operation_CRTP<void, Extend> {
 
     Context&            ctx;
-    Subset_Map& subset_map;
+    ExtensionSubsetMap& subset_map;
 
-    void fallback_impl(AST_Node_Ptr n) { }
+    void fallback_impl(AST_Node* n) { }
 
   public:
     static Node subweave(Node& one, Node& two, Context& ctx);
-    static Selector_List_Ptr extendSelectorList(Selector_List_Obj pSelectorList, Context& ctx, Subset_Map& subset_map, bool isReplace, bool& extendedSomething, std::set<Compound_Selector>& seen);
-    static Selector_List_Ptr extendSelectorList(Selector_List_Obj pSelectorList, Context& ctx, Subset_Map& subset_map, bool isReplace, bool& extendedSomething);
-    static Selector_List_Ptr extendSelectorList(Selector_List_Obj pSelectorList, Context& ctx, Subset_Map& subset_map, bool isReplace = false) {
+    static Selector_List* extendSelectorList(Selector_List* pSelectorList, Context& ctx, ExtensionSubsetMap& subset_map, bool isReplace, bool& extendedSomething);
+    static Selector_List* extendSelectorList(Selector_List* pSelectorList, Context& ctx, ExtensionSubsetMap& subset_map, bool isReplace = false) {
       bool extendedSomething = false;
       return extendSelectorList(pSelectorList, ctx, subset_map, isReplace, extendedSomething);
     }
-    static Selector_List_Ptr extendSelectorList(Selector_List_Obj pSelectorList, Context& ctx, Subset_Map& subset_map, std::set<Compound_Selector>& seen) {
-      bool isReplace = false;
-      bool extendedSomething = false;
-      return extendSelectorList(pSelectorList, ctx, subset_map, isReplace, extendedSomething, seen);
-    }
-    Extend(Context&, Subset_Map&);
+    Extend(Context&, ExtensionSubsetMap&);
     ~Extend() { }
 
-    void operator()(Block_Ptr);
-    void operator()(Ruleset_Ptr);
-    void operator()(Supports_Block_Ptr);
-    void operator()(Media_Block_Ptr);
-    void operator()(Directive_Ptr);
+    void operator()(Block*);
+    void operator()(Ruleset*);
+    void operator()(Supports_Block*);
+    void operator()(Media_Block*);
+    void operator()(Directive*);
 
     template <typename U>
     void fallback(U x) { return fallback_impl(x); }

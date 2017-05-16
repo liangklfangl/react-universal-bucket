@@ -45,9 +45,6 @@
 // include C-API header
 #include "sass/base.h"
 
-// For C++ helper
-#include <string>
-
 // output behaviours
 namespace Sass {
 
@@ -60,11 +57,7 @@ namespace Sass {
   const static Sass_Output_Style INSPECT = SASS_STYLE_INSPECT;
   const static Sass_Output_Style TO_SASS = SASS_STYLE_TO_SASS;
 
-  // helper to aid dreaded MSVC debug mode
-  // see implementation for more details
-  char* sass_copy_string(std::string str);
-
-}
+};
 
 // input behaviours
 enum Sass_Input_Style {

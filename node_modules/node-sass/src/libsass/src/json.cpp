@@ -399,13 +399,7 @@ char *json_encode_string(const char *str)
   SB sb;
   sb_init(&sb);
 
-  try {
-    emit_string(&sb, str);
-  }
-  catch (std::exception) {
-    sb_free(&sb);
-    throw;
-  }
+  emit_string(&sb, str);
 
   return sb_finish(&sb);
 }
@@ -415,16 +409,10 @@ char *json_stringify(const JsonNode *node, const char *space)
   SB sb;
   sb_init(&sb);
 
-  try {
-    if (space != NULL)
-      emit_value_indented(&sb, node, space, 0);
-    else
-      emit_value(&sb, node);
-  }
-  catch (std::exception) {
-    sb_free(&sb);
-    throw;
-  }
+  if (space != NULL)
+    emit_value_indented(&sb, node, space, 0);
+  else
+    emit_value(&sb, node);
 
   return sb_finish(&sb);
 }
