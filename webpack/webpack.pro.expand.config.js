@@ -2,13 +2,15 @@ const webpack = require('webpack');
 const path = require('path');
 require('babel-polyfill');
 const autoprefixer = require('autoprefixer');
-const bootstrapEntryPoints = require('./webpack.bootstrap.config.js');
+// const bootstrapEntryPoints = require('./webpack.bootstrap.config.js');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const projectRootPath = path.resolve(__dirname, '../');
 const assetsPath = path.resolve(projectRootPath, './static/dist');
+const WebpackIsomorphicToolsPlugin = require('webpack-isomorphic-tools/plugin');
+const webpackIsomorphicToolsPlugin = new WebpackIsomorphicToolsPlugin(require('./webpack-isomorphic-tools-config'));
 
-const customFile = path.join(__dirname,"bootstrap/.bootstraprc");
-console.log(`=> bootstrap-loader configuration: ${bootstrapEntryPoints.dev}`);
+// const customFile = path.join(__dirname,"bootstrap/.bootstraprc");
+// console.log(`=> bootstrap-loader configuration: ${bootstrapEntryPoints.dev}`);
 // { dev: 'bootstrap-loader',
 //   prod: 'bootstrap-loader/extractStyles'
 //    }
@@ -30,7 +32,7 @@ module.exports = {
   output: {
     path: assetsPath,
     filename: '[name]-[chunkHash].js',
-    publicPath: '/assets/',
+     publicPath: '/dist/'
   },
 
   // devtool: '#cheap-module-eval-source-map',
@@ -145,5 +147,6 @@ module.exports = {
     new webpack.LoaderOptionsPlugin({
       postcss: [autoprefixer],
     }),
+    webpackIsomorphicToolsPlugin
   ]
 };

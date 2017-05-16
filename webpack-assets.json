@@ -1,0 +1,19 @@
+{
+  "javascript": {
+    "main": "http://localhost:8091/dist/main-35edb61d1858540f5761.js"
+  },
+  "styles": {},
+  "assets": {
+    "./~/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.eot": "http://localhost:8091/dist/f4769f9bdb7466be65088239c12046d1.eot",
+    "./~/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.woff": "http://localhost:8091/dist/fa2772327f55d8198301fdb8bcfc8158.woff",
+    "./~/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.woff2": "http://localhost:8091/dist/448c34a56d699c29117adc64c43affeb.woff2",
+    "./~/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.ttf": "http://localhost:8091/dist/e18bbf611f2a2e43afc071aa2f4e1512.ttf",
+    "./~/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.svg": "http://localhost:8091/dist/89889688147bd7575d6327160d64e760.svg",
+    "./src/components/Footer/index.less": {
+      "_style": ".footer{height:50px;background-color:pink}"
+    },
+    "./src/components/Header/index.less": {
+      "_style": ".header{height:50px;background-color:gray}"
+    }
+  }
+}

@@ -11,14 +11,11 @@ export default class Header extends React.Component{
      console.log("home instantiated");
 		return (
             <div className="header">
-			  <Navbar inverse collapseOnSelect>
+			   <Navbar inverse collapseOnSelect>
 			    <Navbar.Header>
 			      <Navbar.Brand>
-			        <a href="#">React全家桶实例</a>
+			        <a href="#">React-Bootstrap</a>
 			      </Navbar.Brand>
-			        {/*To have a mobile friendly Navbar, Add a Navbar.
-			        Toggle to your Header and wrap your Navs in a Navbar.
-			         Collapse component. The Navbar will automatically wire the toggle and collapse together!*/}
 			      <Navbar.Toggle />
 			    </Navbar.Header>
 			    <Navbar.Collapse>
