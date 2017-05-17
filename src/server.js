@@ -49,12 +49,14 @@ app.use(favicon(path.join(__dirname, '..', 'static', 'favicon.ico')));
 app.use(Express.static(path.join(__dirname, '..', 'static')));
 //我们在client端将资源打包到static/dist目录下，所以我们将静态资源设置为这个路径
 app.use("/api",(req,res)=>{
+  console.log("API请求===>");
 	proxy.web(req,res,{target:targetUrl});
 	//web方法用来代理请求普通的https/http请求。
   //当你发送http://localhost:3000/api，我发送到真实的服务器上去
   //本项目不支持该请求，直接访问会返回NotFound。这是我们API服务器的返回结果
 });
 app.use('/ws', (req, res) => {
+    console.log("ws请求===>");
   //该请求也不支持访问,api里面有io.path('/ws');一定要弄懂
   proxy.web(req, res, {target: targetUrl + '/ws'});
 });
@@ -64,6 +66,7 @@ server.on('upgrade', (req, socket, head) => {
   proxy.ws(req, socket, head);
 });
 proxy.on('error', (error, req, res) => {
+  console.log("res内部的东西",res);
   let json;
   if (error.code !== 'ECONNRESET') {
     console.error('proxy error', error);

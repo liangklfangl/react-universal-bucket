@@ -4,7 +4,8 @@ import { isLoaded as isAuthLoaded, load as loadAuth } from './redux/modules/auth
 import {
     App,
     Home,
-    Login
+    Login,
+    LoginSuccess
   } from './containers';
 //getRoutes(store)
 export default (store) => {
@@ -36,6 +37,10 @@ export default (store) => {
         childRoutes: [
           {
             path:"login",
+            component:Login
+          },
+           {
+            path:"loginsuccess",
             component:Login
           }
         ]

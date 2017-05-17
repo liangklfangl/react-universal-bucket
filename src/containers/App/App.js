@@ -112,19 +112,34 @@ export default class App extends React.Component{
 		logout : PropTypes.func.isRequired,
 		user: PropTypes.object
 	}
-
-    handleLogout= ()=>{
+  
+  handleLogout= ()=>{
       this.props.logout();
+  }
+  //这里的生命周期一定要明白,因为这个App的生命周期确实会经历这个步骤
+  //只要你最外层的组件内部的组件发生变化都会调用
+  //https://github.com/liangklfang/react-router/blob/master/docs/guides/ComponentLifecycle.md
+  //这是最上层的组件，他会接受到Provider的store中的所有内容，然后逐级传递下去用于组件更新。每次
+  //store发生变化都会重新渲染组件树，这是我们使用一个store来管理组件状态的好处!!!!
+  //登陆后我们的nextProps结构见output/App-nextProps.PNG
+  componentWillReceiveProps(nextProps){
+    //表示登录loginSuccess
+    if(!this.props.user && nextProps.user){
+      this.props.pushState("/loginsuccess");
+      //表示登出，回退到主页
+    }else if(this.props.user && !nextProps.user){
+       this.props.pushState("/");
     }
-
+  }
 	render(){
+    const {user} = this.props;
 	//总结一下，state对象的结构由传入的多个reducer的key决定，可以根据
 	//模块拆分的细粒度，考虑是否需要嵌套使用combineReducers
      // console.log("App传入的logout内容:",this.props.logout.toString());
 		 // <div  onClick={this.handleLogout}>登出</div>
     return (
              <div className="container">
-               <Header/>
+               <Header user={user}/>
                  {
                 	this.props.children
                 }

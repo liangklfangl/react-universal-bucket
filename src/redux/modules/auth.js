@@ -106,11 +106,14 @@ export function load() {
 export function login(name) {
   return {
     types: [LOGIN, LOGIN_SUCCESS, LOGIN_FAIL],
-    promise: (client) => client.post('/login', {
+    //对于登录要发送信息，所以用post请求
+    promise: (client) => {
+      return client.post('/login', {
       data: {
         name: name
       }
-    })
+     })
+    }
   };
 }
 

@@ -76,29 +76,29 @@ module.exports = {
     //
     // hooking into 'js' extension require()s isn't the best solution
     // and I'm leaving this comment here in case anyone finds a better idea.
-    bootstrap: {
-      extension: 'js',
-      //在include里面你必须手动指定path，只有在include里面的文件才会被webpack-isomorphic-tools处理
-      //这里的路径和webpack中的context一致，同时支持正则表达式，同时include也支持一个函数，如
-      //function (path){return false/true}
-      include: ['./src/theme/bootstrap.config.js'],
-      filter: function(module, regex, options, log) {
-        function is_bootstrap_style(name) {
-          return name.indexOf('./src/theme/bootstrap.config.js') >= 0;
-        }
-        if (options.development) {
-          return is_bootstrap_style(module.name) && WebpackIsomorphicToolsPlugin.style_loader_filter(module, regex, options, log);
-        }
-        // no need for it in production mode
-      },
-      // in development mode there's webpack "style-loader",
-      // so the module.name is not equal to module.name
-      path: WebpackIsomorphicToolsPlugin.style_loader_path_extractor,
-      parser: WebpackIsomorphicToolsPlugin.css_loader_parser
-    },
-    //如果你使用webpack的`css modules`特性，同时在production模式下你使用了ExtractTextPlugin，你可以如下配置
-    //注意：目前我的调试获取到配置为{dev:true}，所以是development即开发环境，在开发环境下我是不会使用ExtractTextPlugin
-    //所以我在hook中也删除了这个插件
+    // bootstrap: {
+    //   extension: 'js',
+    //   //在include里面你必须手动指定path，只有在include里面的文件才会被webpack-isomorphic-tools处理
+    //   //这里的路径和webpack中的context一致，同时支持正则表达式，同时include也支持一个函数，如
+    //   //function (path){return false/true}
+    //   include: ['./src/theme/bootstrap.config.js'],
+    //   filter: function(module, regex, options, log) {
+    //     function is_bootstrap_style(name) {
+    //       return name.indexOf('./src/theme/bootstrap.config.js') >= 0;
+    //     }
+    //     if (options.development) {
+    //       return is_bootstrap_style(module.name) && WebpackIsomorphicToolsPlugin.style_loader_filter(module, regex, options, log);
+    //     }
+    //     // no need for it in production mode
+    //   },
+    //   // in development mode there's webpack "style-loader",
+    //   // so the module.name is not equal to module.name
+    //   path: WebpackIsomorphicToolsPlugin.style_loader_path_extractor,
+    //   parser: WebpackIsomorphicToolsPlugin.css_loader_parser
+    // },
+    // 如果你使用webpack的`css modules`特性，同时在production模式下你使用了ExtractTextPlugin，你可以如下配置
+    // 注意：目前我的调试获取到配置为{dev:true}，所以是development即开发环境，在开发环境下我是不会使用ExtractTextPlugin
+    // 所以我在hook中也删除了这个插件
     style_modules: {
       extensions: ['less','scss'],
       filter: function(module, regex, options, log) {
@@ -135,6 +135,6 @@ module.exports = {
           return module.source;
         }
       }
-    }
+   }
   }
 }

@@ -7,7 +7,7 @@ const webpackConfig = require("./webpack.dev.config.js")(customConfigPath);
 const util = require("util");
 const path = require("path");
 const webpack = require("webpack");
-console.log(util.inspect(webpackConfig.plugins,{showHidden:true,depth:3}));
+console.log(util.inspect(webpackConfig,{showHidden:true,depth:3}));
 // const output = path.join(__dirname, '../dist').replace(/\\/g, '/');
 // console.log("webpack打包完成",output);
 // webpackConfig.output.path=(process.cwd().replace(/\\/g, '/')+"/build");
@@ -37,5 +37,3 @@ app.listen(port,function onAppListening(err){
 		    console.info('Webpack开发环境服务器在端口号%s监听', port);
 		}
 });
-//  console.log(util.inspect(webpackConfig,{showHidden:true,depth:6}));
-// console.log("webpack打包完成");

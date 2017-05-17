@@ -30,22 +30,28 @@ export default function clientMiddleware(client) {
       if (typeof action === 'function') {
         return action(dispatch, getState);
       }
+      // console.log("actions---->",action);
       const { promise, types, ...rest } = action;
       //得到action中的promise, types等属性,如果promise为空，那么直接调用
       //下一个中间件middleware,只有当有promise的时候才调用这个middleware
       if (!promise) {
         return next(action);
       }
-
       const [REQUEST, SUCCESS, FAILURE] = types;
       //得到types中的REQUEST, SUCCESS, FAILURE
       next({...rest, type: REQUEST});
       //执行请求
       const actionPromise = promise(client);
-      //执行我们的client,此时是一个ApiClient实例，有
+      //执行我们的client,此时是一个ApiClient实例
       actionPromise.then(
-        (result) => next({...rest, result, type: SUCCESS}),
-        (error) => next({...rest, error, type: FAILURE})
+        function(result){
+          console.log("服务端得到数据",result);
+          next({...rest, result, type: SUCCESS})
+        },
+        function(error){
+           console.log("服务端得到数据error",error);
+            next({...rest, error, type: FAILURE})
+        }
       ).catch((error)=> {
         console.error('MIDDLEWARE ERROR:', error);
         next({...rest, error, type: FAILURE});

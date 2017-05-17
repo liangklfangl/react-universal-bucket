@@ -9,7 +9,7 @@ function formatUrl(path) {
   //在path前面添加'/'
   if (__SERVER__) {
     // 在path前面添加HOST与PORT
-    return 'http://' + process.env.APIHOST + ':' + process.env.APIPORT + adjustedPath;
+    return 'http://' + (process.env.APIHOST||"localhost") + ':' + (process.env.APIPORT||"3030") + adjustedPath;
   }
   // 如果不是__SERVER__，那么添加/api即可
   return '/api' + adjustedPath;
@@ -20,6 +20,8 @@ export default class ApiClient {
     methods.forEach((method) =>
      //返回的对象有上面的五个方法，接收第一个参数为path，第二个参数有params,data属性
       this[method] = (path, { params, data } = {}) => new Promise((resolve, reject) => {
+       console.log("path===========",path);
+        console.log("superagent发送消息得到的URL",formatUrl(path));
         const request = superagent[method](formatUrl(path));
         if (params) {
           request.query(params);
