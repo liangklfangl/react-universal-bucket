@@ -41,12 +41,21 @@ export default function createStore(history, client, data) {
   //要完成对dispatch的增强~~~
   let finalCreateStore;
   //如果是开发环境，同时是客户端，同时__DEVTOOLS__设置为true
-  //那么我们加入redux的开发工具
+  //那么我们加入redux的开发工具,服务端渲染的时候我们的__CLIENT__是false,我们不会添加
+  //这部分代码
   if (__DEVELOPMENT__ && __CLIENT__ && __DEVTOOLS__) {
     const { persistState } = require('redux-devtools');
      //提供一个redux及时编辑的事件旅行环境
     const DevTools = require('../containers/DevTools/DevTools');
     //得到我们的redux的开发工具
+    //http://redux.js.org/docs/api/compose.html
+    //使用我们的compose组合多个store enhancer来增强store
+    //applyMiddleware的结构不要忘了：https://github.com/liangklfangl/redux-createstore
+    //(1)一般我们直接将applyMiddleware作为createStore的参数传递来增强store
+    //(2)但是我们这里使用了另外一种方式来增强store
+    //其实我们调用middleware以及传入__createStore后得到的这个函数的签名和createStore是完全一样的，这也是为什么我们
+    //这里命名为finalCreateStore的原因，我们此时得到的store也是通过middleware增强后的store，和
+    //调用createStore传入applyMiddleware是一样的结果，一样的结果，一样的结果!!!
     finalCreateStore = compose(
       applyMiddleware(...middleware),
       window.devToolsExtension ? window.devToolsExtension() : DevTools.instrument(),
@@ -60,20 +69,23 @@ export default function createStore(history, client, data) {
     //applyMiddleware的第一级已经被打开，得到(reducer, preloadedState, enhancer) => {}
   }
   const reducer = require('./modules/reducer');
-  //如果createStore传入了第三个参数那么保存他的pagination
+  //这里的data是服务端传递的store.getState，即应用的完整的state状态。所以你可以通过
+  //combineReducer得到操作的结果
   if (data) {
     data.pagination = Immutable.fromJS(data.pagination);
   }
   const store = finalCreateStore(reducer, data);
-  //其中data传入的表示我们整个应用的state状态
-  //继续调用(reducer, preloadedState, enhancer) => {}得到如下结构：
-  // return {
+  // createStore(reducer, [preloadedState], [enhancer])
+  // 对我们增强后的store进行进一步的处理
+  // 第一个参数表示数据库计算方式，第二个表示初始状态，我们从服务器端获取到的内容
+  // 就是初始客户端state
+  // http://redux.js.org/docs/api/createStore.html
+  // 最后得到的结果就是如下内容，即store里面的所有内容以及一个dispatch方法
+  // 即返回的这个对象有dispatch,subscribe,getState,replaceReducer,observable等一系列store应该由的方式
+  //  return {
     //   ...store,
     //   dispatch
     // }
-    // 此时返回的对象有一个dispatch用于直接发送消息到store，传入action即可
-    // 同时我们的store上具有的原有方法都被保存下来，同时也外加了一个dispatch
-  //如果是开发环境，同时模块本身支持HMR，那么我们热加载
   if (__DEVELOPMENT__ && module.hot) {
     module.hot.accept('./modules/reducer', () => {
       store.replaceReducer(require('./modules/reducer'));

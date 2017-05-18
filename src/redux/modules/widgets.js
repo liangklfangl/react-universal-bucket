@@ -91,7 +91,7 @@ export function isLoaded(globalState) {
 }
 
 /**
- * 获取服务端所有的widgets
+ * 获取服务端所有的widgets，后面两个参数param1,param2只是为了演示
  * @return {[type]} [description]
  */
 export function load() {

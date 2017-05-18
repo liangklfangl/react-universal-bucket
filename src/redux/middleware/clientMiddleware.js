@@ -20,6 +20,7 @@
   }
   */
 export default function clientMiddleware(client) {
+  
  //这里是middleware的方式
  //Detail: https://github.com/liangklfangl/redux-createstore
  //对于redux的middleware来说：第一级别传入dispath和getState,第二级别传入store.dispatch,第三级别传入action即可
@@ -45,11 +46,11 @@ export default function clientMiddleware(client) {
       //执行我们的client,此时是一个ApiClient实例
       actionPromise.then(
         function(result){
-          console.log("服务端得到数据",result);
+          console.log("clientMiddleware服务端得到数据",result);
           next({...rest, result, type: SUCCESS})
         },
         function(error){
-           console.log("服务端得到数据error",error);
+           console.log("clientMiddleware服务端得到数据error",error);
             next({...rest, error, type: FAILURE})
         }
       ).catch((error)=> {

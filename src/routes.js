@@ -5,7 +5,8 @@ import {
     App,
     Home,
     Login,
-    LoginSuccess
+    LoginSuccess,
+    Widget
   } from './containers';
 //getRoutes(store)
 export default (store) => {
@@ -42,6 +43,10 @@ export default (store) => {
            {
             path:"loginsuccess",
             component:Login
+          },
+           {
+            path:"widget",
+            component:Widget
           }
         ]
       }

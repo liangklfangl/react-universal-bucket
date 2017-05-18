@@ -15,23 +15,32 @@ const client = new ApiClient();
 // const _browserHistory = useScroll(() => browserHistory)();
 const dest = document.getElementById('content');
 const store = createStore(browserHistory, client, window.__data);
+//其中window.__data表示的是服务器端传递过来的sotre的状态，通过它来构建出客户端的store
+//window.__data=${serialize(store.getState())};
 // const store = createStore(_browserHistory, client, window.__data);
 // const history = syncHistoryWithStore(_browserHistory, store);
 const history = syncHistoryWithStore(browserHistory, store);
-//
+//这里实例化一个socket，path为"/ws"，其会发送到我们的反代理服务器，我们的反代理服务器会接收到
+//最后通过反代理服务器发送到我们的API服务器上
+//app.use('/ws', (req, res) => {
+//   proxy.web(req, res, {target: targetUrl + '/ws'});
+// });
 function initSocket() {
   const socket = io('', {path: '/ws'});
+   // socket.emit('news', {msg: `'Hello World!' from server`});
+   // 如果服务端接收到连接的时候，服务端会发送一个news事件并携带相应的数据
   socket.on('news', (data) => {
     console.log(data);
-    socket.emit('my other event', { my: 'data from client' });
+    // socket.emit('my other event', { my: 'data from client' });
+     socket.emit('msg', { my: '我是来自于客户端的数据' });
   });
+  //接收到服务器端的msg事件
   socket.on('msg', (data) => {
-    console.log(data);
+    console.log("客户端msg接收到服务端数据",data);
   });
-
   return socket;
 }
-
+//客户端sockt接收了news和msg等服务器发送过来的内容
 global.socket = initSocket();
 
 const component = (
@@ -42,6 +51,7 @@ const component = (
   </Router>
 );
 
+//我们的
 ReactDOM.render(
   <Provider store={store} key="provider">
     {component}

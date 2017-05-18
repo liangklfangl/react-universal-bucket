@@ -8,9 +8,9 @@
 //其实这里的availableActions={logout:logout,widget:widget}
   // prev = {action: availableActions, params: []}
   // 其中current就是我们的URL中的path部分，也就是发起了某一个请求，如果没有找到这个path
-  // 直接返回undefinedexport function mapUrl(availableActions = {}, url = []) {
-  // const notFound = {action: null, params: []};
-  // test for empty input
+  // 直接返回undefined。
+  // 第一个参数是服务器接收的所有的action请求
+  // 第二个参数是我们请求的url的path数组
   function mapUrl(availableActions = {}, url = []) {
    const notFound = {action: null, params: []};
   if (url.length === 0 || Object.keys(availableActions).length === 0) {
@@ -19,13 +19,9 @@
   const reducer = (prev, current) => {
     if (prev.action && prev.action[current]) {
       return {action: prev.action[current], params: []}; 
-      // go deeper
-      // 如果hello这个action已经存在，那么直接返回，保存原样
-      // 如URL为http://localhost:3030/logout那么可以直接获取到这个action的值
+      //如果返回的这个对象
     } else {
       if (typeof prev.action === 'function') {
-        //如果当前这个url有对应的action是一个函数，而不是一个对象，那么直接action即调用这个函数
-        //这当export default function的时候有用
         return {action: prev.action, params: prev.params.concat(current)}; 
         // params are found
       } else {
@@ -34,8 +30,10 @@
     }
   };
   //遍历数组["hello", "world"]
+  //注意这里是reduce而不是reduceRight，所以我们关注于current，而不是prev。默认参数是prev
+  //每次迭代出来的元素都是current
+  //详细的分析参考api/test.js
   const actionAndParams = url.reduce(reducer, {action: availableActions, params: []});
-  // console.log("action集合为",util.inspect(availableActions,{showHidden:true,depth:3}));
   return (typeof actionAndParams.action === 'function') ? actionAndParams : notFound;
 }
 

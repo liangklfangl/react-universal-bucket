@@ -20,6 +20,7 @@ import widgets from './widgets';
 export default combineReducers({
   routing: routerReducer,
   //react-router-redux的routerReducer必须在combineReducers里面，同时key必须是routing
+  //保证history,location,store同步更新，支持时间旅行
   reduxAsyncConnect,
   auth,
   //通过redux-form的中间件来处理

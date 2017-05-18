@@ -8,20 +8,27 @@ function formatUrl(path) {
   const adjustedPath = path[0] !== '/' ? '/' + path : path;
   //在path前面添加'/'
   if (__SERVER__) {
-    // 在path前面添加HOST与PORT
+    // 在path前面添加HOST与PORT。如果是反代理服务器向服务器发送请求就必须知道APIHOST和APIPORT，也就是域名和端口
     return 'http://' + (process.env.APIHOST||"localhost") + ':' + (process.env.APIPORT||"3030") + adjustedPath;
   }
-  // 如果不是__SERVER__，那么添加/api即可
+  // 如果不是__SERVER__，那么添加/api即可，此时表示用户直接访问反代理服务器，此时在server.js中处理了。由反代理服务器向代理服务器发送请求
+  // 其中server.js中有下面的代码处理/api请求:
+  // app.use("/api",(req,res)=>{
+ //   proxy.web(req,res,{target:targetUrl});
+ // });
   return '/api' + adjustedPath;
 }
 
 export default class ApiClient {
   constructor(req) {
     methods.forEach((method) =>
-     //返回的对象有上面的五个方法，接收第一个参数为path，第二个参数有params,data属性
+     //返回的对象有上面的五个方法
+     //接收第一个参数为path，表示要发送的请求的URL。如加载widget得到的是/widget/load/param1/param2
+     //第二个参数有params,data属性，表示发送到服务器端请求的参数和数据,load方法没有，但是save方法是有的
+     //client.post('/widget/update', {
+    //   data: widget
+    // })
       this[method] = (path, { params, data } = {}) => new Promise((resolve, reject) => {
-       console.log("path===========",path);
-        console.log("superagent发送消息得到的URL",formatUrl(path));
         const request = superagent[method](formatUrl(path));
         if (params) {
           request.query(params);
