@@ -12,84 +12,59 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactFontawesome = require('react-fontawesome');
-
-var _reactFontawesome2 = _interopRequireDefault(_reactFontawesome);
-
 var _classnames = require('classnames');
 
 var _classnames2 = _interopRequireDefault(_classnames);
 
-var _SortLink = require('./SortLink');
+var _ColumnHeader = require('./ColumnHeader');
 
-var _SortLink2 = _interopRequireDefault(_SortLink);
+var _ColumnHeader2 = _interopRequireDefault(_ColumnHeader);
 
 var _decorators = require('./decorators');
 
-var _pageInfoTranslator = require('./pageInfoTranslator');
+var _DataRow = require('./containers/DataRow');
+
+var _DataRow2 = _interopRequireDefault(_DataRow);
+
+var _TableRow = require('./TableRow');
+
+var _TableRow2 = _interopRequireDefault(_TableRow);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function renderRow(headers) {
+  return function (id, i) {
+    return _react2.default.createElement(_DataRow2.default, {
+      key: i,
+      itemId: id,
+      component: _TableRow2.default,
+      index: i,
+      headers: headers
+    });
+  };
+}
+
 function DataTable(props) {
-  var results = props.results,
+  var ids = props.ids,
       headers = props.headers,
       isLoading = props.isLoading,
-      updating = props.updating,
-      removing = props.removing,
       _props$className = props.className,
       className = _props$className === undefined ? 'border' : _props$className;
 
-
-  if (isLoading) {
-    return _react2.default.createElement(
-      'center',
-      null,
-      _react2.default.createElement(_reactFontawesome2.default, {
-        name: 'spinner',
-        spin: true,
-        size: '5x'
-      })
-    );
-  }
 
   var headerRow = headers.map(function (h) {
     return _react2.default.createElement(
       'th',
       { key: h.field },
-      _react2.default.createElement(_SortLink2.default, _extends({}, props, h))
+      _react2.default.createElement(_ColumnHeader2.default, _extends({}, props, h))
     );
   });
 
-  var rows = results.map(function (r, i) {
-    var columns = headers.map(function (h) {
-      var field = h.field,
-          format = h.format;
-
-      var data = r.get(field);
-      var displayData = format && format(r, i) || data;
-
-      return _react2.default.createElement(
-        'td',
-        { key: field },
-        displayData
-      );
-    });
-
-    var classes = (0, _classnames2.default)({
-      updating: updating.includes(r.get((0, _pageInfoTranslator.recordProps)().identifier)),
-      removing: removing.includes(r.get((0, _pageInfoTranslator.recordProps)().identifier))
-    });
-
-    return _react2.default.createElement(
-      'tr',
-      { className: classes, key: 'results-' + i },
-      columns
-    );
-  });
+  var classes = (0, _classnames2.default)(className, { loading: isLoading });
 
   return _react2.default.createElement(
     'table',
-    { className: className },
+    { className: classes },
     _react2.default.createElement(
       'thead',
       null,
@@ -102,7 +77,7 @@ function DataTable(props) {
     _react2.default.createElement(
       'tbody',
       null,
-      rows
+      ids.map(renderRow(headers))
     )
   );
 }
@@ -110,10 +85,8 @@ function DataTable(props) {
 DataTable.propTypes = {
   headers: _react.PropTypes.array.isRequired,
   isLoading: _react.PropTypes.bool,
-  results: _react.PropTypes.object,
-  updating: _react.PropTypes.object,
-  removing: _react.PropTypes.object,
+  ids: _react.PropTypes.arrayOf(_react.PropTypes.oneOfType([_react.PropTypes.string, _react.PropTypes.number])),
   className: _react.PropTypes.string
 };
 
-exports.default = (0, _decorators.tabulate)(DataTable);
+exports.default = (0, _decorators.tabulateLean)(DataTable);

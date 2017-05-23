@@ -10,7 +10,7 @@ import {
 import { Link } from 'react-router'
 
 import Loading from './Loading'
-import fetchRecipes from './actions'
+import fetchRecipes, { toggleActive } from './actions'
 
 export class Index extends Component {
   static propTypes = {
@@ -37,6 +37,17 @@ export class Index extends Component {
       field: 'boil_time',
       sortable: false,
       text: I18n.t('recipes.boil_time')
+    }, {
+      field: 'active',
+      sortable: false,
+      text: 'Active?',
+      format: recipe => (
+        <input
+          type="checkbox"
+          checked={!!recipe.active}
+          onChange={() => this.props.toggle(recipe)}
+        />
+      )
     }]
   }
 
@@ -64,5 +75,5 @@ export default connect(
   state => ({
     loading: !state.recipes.get('connected')
   }),
-  { fetch: fetchRecipes }
+  { fetch: fetchRecipes, toggle: toggleActive }
 )(Index)

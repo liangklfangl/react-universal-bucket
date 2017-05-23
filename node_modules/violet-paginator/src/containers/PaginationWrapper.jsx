@@ -18,11 +18,22 @@ export class PaginationWrapper extends Component {
   static propTypes = {
     pageActions: PropTypes.object.isRequired,
     paginator: PropTypes.object,
-    children: PropTypes.element.isRequired
+    children: PropTypes.element.isRequired,
+    listId: PropTypes.string.isRequired
+  }
+
+  static childContextTypes = {
+    listId: PropTypes.string
   }
 
   static defaultProps = {
     paginator: defaultPaginator
+  }
+
+  getChildContext() {
+    return {
+      listId: this.props.listId
+    }
   }
 
   componentDidMount() {

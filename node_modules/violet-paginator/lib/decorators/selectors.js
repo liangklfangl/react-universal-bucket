@@ -7,6 +7,9 @@ Object.defineProperty(exports, "__esModule", {
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 exports.default = select;
+
+var _pageInfoTranslator = require('../pageInfoTranslator');
+
 function select(paginator) {
   var totalPages = Math.ceil(paginator.get('totalCount') / paginator.get('pageSize'));
 
@@ -28,10 +31,17 @@ function select(paginator) {
 
   var tabulate = function tabulate() {
     return {
-      results: paginator.get('results'),
-      isLoading: paginator.get('isLoading'),
-      updating: paginator.get('updating'),
-      removing: paginator.get('removing')
+      results: paginator.get('results').toJS(),
+      isLoading: paginator.get('isLoading')
+    };
+  };
+
+  var tabulateLean = function tabulateLean() {
+    return {
+      ids: paginator.get('results').map(function (r) {
+        return r.get((0, _pageInfoTranslator.recordProps)().identifier);
+      }),
+      isLoading: paginator.get('isLoading')
     };
   };
 
@@ -56,6 +66,7 @@ function select(paginator) {
     flip: flip,
     paginate: paginate,
     tabulate: tabulate,
+    tabulateLean: tabulateLean,
     stretch: stretch,
     sort: sort,
     violetPaginator: violetPaginator

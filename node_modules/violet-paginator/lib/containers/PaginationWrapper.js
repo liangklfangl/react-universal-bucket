@@ -49,6 +49,13 @@ var PaginationWrapper = exports.PaginationWrapper = function (_Component) {
   }
 
   _createClass(PaginationWrapper, [{
+    key: 'getChildContext',
+    value: function getChildContext() {
+      return {
+        listId: this.props.listId
+      };
+    }
+  }, {
     key: 'componentDidMount',
     value: function componentDidMount() {
       var _props = this.props,
@@ -90,7 +97,11 @@ var PaginationWrapper = exports.PaginationWrapper = function (_Component) {
 PaginationWrapper.propTypes = {
   pageActions: _react.PropTypes.object.isRequired,
   paginator: _react.PropTypes.object,
-  children: _react.PropTypes.element.isRequired
+  children: _react.PropTypes.element.isRequired,
+  listId: _react.PropTypes.string.isRequired
+};
+PaginationWrapper.childContextTypes = {
+  listId: _react.PropTypes.string
 };
 PaginationWrapper.defaultProps = {
   paginator: _reducer.defaultPaginator

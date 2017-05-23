@@ -12,10 +12,6 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactFontawesome = require('react-fontawesome');
-
-var _reactFontawesome2 = _interopRequireDefault(_reactFontawesome);
-
 var _classnames = require('classnames');
 
 var _classnames2 = _interopRequireDefault(_classnames);
@@ -28,7 +24,7 @@ var _range = require('./lib/range');
 
 var _range2 = _interopRequireDefault(_range);
 
-var _PageLink = require('./PageLink');
+var _PageNumber = require('./PageNumber');
 
 var _Prev = require('./Prev');
 
@@ -40,16 +36,12 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 function Paginator(props) {
   var currentPage = props.currentPage,
-      totalPages = props.totalPages,
-      hasPreviousPage = props.hasPreviousPage,
-      hasNextPage = props.hasNextPage;
+      totalPages = props.totalPages;
 
 
   var upperOffset = Math.max(0, currentPage - totalPages + 3);
   var minPage = Math.max(props.currentPage - 3 - upperOffset, 1);
   var maxPage = Math.min(minPage + 6, totalPages);
-  var prevClasses = (0, _classnames2.default)({ disabled: !hasPreviousPage });
-  var nextClasses = (0, _classnames2.default)({ disabled: !hasNextPage });
 
   var pageLinks = [].concat(_toConsumableArray((0, _range2.default)(minPage, maxPage))).map(function (page) {
     var pageLinkClass = (0, _classnames2.default)({ current: page === currentPage });
@@ -57,26 +49,26 @@ function Paginator(props) {
     return _react2.default.createElement(
       'li',
       { className: pageLinkClass, key: page },
-      _react2.default.createElement(_PageLink.PageLink, _extends({}, props, { page: page }))
+      _react2.default.createElement(_PageNumber.PageNumber, _extends({}, props, { page: page }))
     );
   });
 
   var separator = totalPages > 7 ? _react2.default.createElement(
     'li',
     { className: 'skip' },
-    _react2.default.createElement(_reactFontawesome2.default, { name: 'ellipsis-h' })
+    _react2.default.createElement('i', { className: 'fa fa-ellipsis-h' })
   ) : false;
 
   var begin = separator && minPage > 1 ? _react2.default.createElement(
     'li',
     null,
-    _react2.default.createElement(_PageLink.PageLink, _extends({}, props, { page: 1 }))
+    _react2.default.createElement(_PageNumber.PageNumber, _extends({}, props, { page: 1 }))
   ) : false;
 
   var end = separator && maxPage < totalPages ? _react2.default.createElement(
     'li',
     null,
-    _react2.default.createElement(_PageLink.PageLink, _extends({}, props, { page: totalPages }))
+    _react2.default.createElement(_PageNumber.PageNumber, _extends({}, props, { page: totalPages }))
   ) : false;
 
   return _react2.default.createElement(
@@ -84,7 +76,7 @@ function Paginator(props) {
     { className: 'pagination' },
     _react2.default.createElement(
       'li',
-      { className: prevClasses },
+      null,
       _react2.default.createElement(_Prev.Prev, props)
     ),
     begin,
@@ -94,7 +86,7 @@ function Paginator(props) {
     end,
     _react2.default.createElement(
       'li',
-      { className: nextClasses },
+      null,
       _react2.default.createElement(_Next.Next, props)
     )
   );

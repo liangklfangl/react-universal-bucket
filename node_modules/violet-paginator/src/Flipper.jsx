@@ -1,19 +1,15 @@
 import React, { PropTypes } from 'react'
-import classNames from 'classnames'
 import { flip } from './decorators'
 import { Prev } from './Prev'
 import { Next } from './Next'
 
 export function Flipper(props) {
-  const prevClasses = classNames({ disabled: !props.hasPreviousPage })
-  const nextClasses = classNames({ disabled: !props.hasNextPage })
-
   return (
     <ul className="pagination">
-      <li className={prevClasses}>
+      <li>
         <Prev {...props} />
       </li>
-      <li className={nextClasses}>
+      <li>
         <Next {...props} />
       </li>
     </ul>

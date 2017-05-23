@@ -92,13 +92,11 @@ function translate(paginator) {
   var _extends2;
 
   var _paginator$toJS = paginator.toJS(),
-      id = _paginator$toJS.id,
       page = _paginator$toJS.page,
       pageSize = _paginator$toJS.pageSize,
       filters = _paginator$toJS.filters;
 
   return {
-    id: id,
     query: _extends((_extends2 = {}, _defineProperty(_extends2, pageParam, page), _defineProperty(_extends2, pageSizeParam, pageSize), _extends2), sortParams(paginator), filters)
   };
 }

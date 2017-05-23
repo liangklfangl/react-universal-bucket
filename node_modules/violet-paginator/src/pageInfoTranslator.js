@@ -88,14 +88,12 @@ function sortParams(paginator) {
 
 export function translate(paginator) {
   const {
-    id,
     page,
     pageSize,
     filters
   } = paginator.toJS()
 
   return {
-    id,
     query: {
       [pageParam]: page,
       [pageSizeParam]: pageSize,

@@ -3,7 +3,8 @@ import expect from 'expect'
 import { mount } from 'enzyme'
 import { PaginationWrapper } from '../../src/containers/PaginationWrapper'
 import { defaultPaginator } from '../../src/reducer'
-import { Prev } from '../../src/Prev'
+
+const MockComponent = () => false
 
 function getProps(props = {}) {
   return {
@@ -20,7 +21,7 @@ describe('<PaginationWrapper />', () => {
     const props = getProps()
     mount(
       <PaginationWrapper {...props}>
-        <Prev />
+        <MockComponent />
       </PaginationWrapper>
     )
 
@@ -33,7 +34,7 @@ describe('<PaginationWrapper />', () => {
     const props = getProps({ initialized: true })
     mount(
       <PaginationWrapper {...props}>
-        <Prev />
+        <MockComponent />
       </PaginationWrapper>
     )
 
@@ -47,7 +48,7 @@ describe('<PaginationWrapper />', () => {
       const props = getProps({ stale: true })
       mount(
         <PaginationWrapper {...props}>
-          <Prev />
+          <MockComponent />
         </PaginationWrapper>
       )
 
@@ -64,7 +65,7 @@ describe('<PaginationWrapper />', () => {
 
       mount(
         <PaginationWrapper {...props}>
-          <Prev />
+          <MockComponent />
         </PaginationWrapper>
       )
 

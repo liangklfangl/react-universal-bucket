@@ -1,8 +1,7 @@
 import React, { PropTypes } from 'react'
-import FontAwesome from 'react-fontawesome'
 import { sort as decorate } from './decorators'
 
-export function SortLink({ pageActions, field, text, sort, sortReverse, sortable=true }) {
+export function ColumnHeader({ pageActions, field, text, sort, sortReverse, sortable=true }) {
   if (!sortable) {
     return <span>{text}</span>
   }
@@ -11,17 +10,20 @@ export function SortLink({ pageActions, field, text, sort, sortReverse, sortable
     pageActions.sort(field, !sortReverse)
 
   const arrow = sort === field && (
-    sortReverse ? 'angle-up' : 'angle-down'
+    sortReverse ? 'sort-desc' : 'sort-asc'
   )
 
+  const icon = arrow || 'sort'
+
   return (
-    <a onClick={sortByField}>
-      {text} <FontAwesome name={arrow || ''} />
-    </a>
+    <button onClick={sortByField}>
+      {text}
+      <i className={`fa fa-${icon}`} />
+    </button>
   )
 }
 
-SortLink.propTypes = {
+ColumnHeader.propTypes = {
   sort: PropTypes.string,
   sortReverse: PropTypes.bool,
   pageActions: PropTypes.object,
@@ -30,5 +32,5 @@ SortLink.propTypes = {
   sortable: PropTypes.bool
 }
 
-export default decorate(SortLink)
+export default decorate(ColumnHeader)
 

@@ -22,9 +22,19 @@ configurePageParams({
 })
 
 const devtools = window.devToolsExtension ? window.devToolsExtension() : f => f
+
+const logger = store => next => action => {
+  console.group(action.type)
+  console.info('dispatching', action)
+  let result = next(action)
+  console.log('next state', store.getState().recipeGrid.toJS())
+  console.groupEnd(action.type)
+  return result
+}
+
 const store = createStore(
   reducers,
-  compose(applyMiddleware(thunk), devtools)
+  compose(applyMiddleware(thunk, logger), devtools)
 )
 
 syncTranslationWithStore(store)

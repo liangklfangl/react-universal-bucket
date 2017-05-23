@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.violetPaginator = exports.tabulate = exports.sort = exports.stretch = exports.paginate = exports.flip = exports.decorate = undefined;
+exports.withRecordProps = exports.violetPaginator = exports.tabulateLean = exports.tabulate = exports.sort = exports.stretch = exports.paginate = exports.flip = exports.decorate = undefined;
 
 var _decorate2 = require('./decorate');
 
@@ -29,9 +29,17 @@ var _tabulate2 = require('./tabulate');
 
 var _tabulate3 = _interopRequireDefault(_tabulate2);
 
+var _tabulateLean2 = require('./tabulateLean');
+
+var _tabulateLean3 = _interopRequireDefault(_tabulateLean2);
+
 var _violetPaginator2 = require('./violetPaginator');
 
 var _violetPaginator3 = _interopRequireDefault(_violetPaginator2);
+
+var _withRecordProps2 = require('./withRecordProps');
+
+var _withRecordProps3 = _interopRequireDefault(_withRecordProps2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -41,4 +49,6 @@ exports.paginate = _paginate3.default;
 exports.stretch = _stretch3.default;
 exports.sort = _sort3.default;
 exports.tabulate = _tabulate3.default;
+exports.tabulateLean = _tabulateLean3.default;
 exports.violetPaginator = _violetPaginator3.default;
+exports.withRecordProps = _withRecordProps3.default;

@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.currentQuery = exports.isRemoving = exports.isUpdating = exports.configurePageParams = exports.decorators = exports.createPaginator = exports.VioletPageSizeDropdown = exports.VioletNext = exports.VioletPrev = exports.VioletSortLink = exports.VioletPaginator = exports.VioletFlipper = exports.VioletDataTable = exports.expireAll = exports.composables = undefined;
+exports.currentQuery = exports.getItem = exports.isRemoving = exports.isUpdating = exports.configurePageParams = exports.decorators = exports.createPaginator = exports.DataRow = exports.VioletPageSizeDropdown = exports.VioletPageNumber = exports.VioletNext = exports.VioletPrev = exports.VioletColumnHeader = exports.VioletPaginator = exports.VioletFlipper = exports.VioletDataTable = exports.expireAll = exports.composables = undefined;
 
 var _actions = require('./actions');
 
@@ -37,6 +37,12 @@ Object.defineProperty(exports, 'isRemoving', {
     return _stateManagement.isRemoving;
   }
 });
+Object.defineProperty(exports, 'getItem', {
+  enumerable: true,
+  get: function get() {
+    return _stateManagement.getItem;
+  }
+});
 Object.defineProperty(exports, 'currentQuery', {
   enumerable: true,
   get: function get() {
@@ -58,9 +64,9 @@ var _Paginator = require('./Paginator');
 
 var _Paginator2 = _interopRequireDefault(_Paginator);
 
-var _SortLink = require('./SortLink');
+var _ColumnHeader = require('./ColumnHeader');
 
-var _SortLink2 = _interopRequireDefault(_SortLink);
+var _ColumnHeader2 = _interopRequireDefault(_ColumnHeader);
 
 var _Prev = require('./Prev');
 
@@ -70,9 +76,17 @@ var _Next = require('./Next');
 
 var _Next2 = _interopRequireDefault(_Next);
 
+var _PageNumber = require('./PageNumber');
+
+var _PageNumber2 = _interopRequireDefault(_PageNumber);
+
 var _PageSizeDropdown = require('./PageSizeDropdown');
 
 var _PageSizeDropdown2 = _interopRequireDefault(_PageSizeDropdown);
+
+var _DataRow2 = require('./containers/DataRow');
+
+var _DataRow3 = _interopRequireDefault(_DataRow2);
 
 var _reducer = require('./reducer');
 
@@ -90,9 +104,11 @@ exports.composables = _actions2.default;
 exports.VioletDataTable = _DataTable2.default;
 exports.VioletFlipper = _Flipper2.default;
 exports.VioletPaginator = _Paginator2.default;
-exports.VioletSortLink = _SortLink2.default;
+exports.VioletColumnHeader = _ColumnHeader2.default;
 exports.VioletPrev = _Prev2.default;
 exports.VioletNext = _Next2.default;
+exports.VioletPageNumber = _PageNumber2.default;
 exports.VioletPageSizeDropdown = _PageSizeDropdown2.default;
+exports.DataRow = _DataRow3.default;
 exports.createPaginator = _reducer2.default;
 exports.decorators = _decorators;

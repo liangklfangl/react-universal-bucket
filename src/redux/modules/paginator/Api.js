@@ -58,13 +58,19 @@ export default {
   //发送get请求
   recipes: {
     index: function(filters={}){
-      console.log("API接收到数据为:",filters);
       //此处filter类型为:
       //{
       // page:1,
       // results_per_page:15
       //}
       return api().get('/recipes', { params: { ...filters } })
+    },
+    update:function(data){
+     //发送数据到服务端，这是必须保证服务端数据发生变化
+      console.log("api中的update接收到数据:",data);
+      return new Promise(function(resolve,reject){
+         resolve(data);
+      });
     },
     show: (id) =>
       api().get(`/recipes/${id}`)

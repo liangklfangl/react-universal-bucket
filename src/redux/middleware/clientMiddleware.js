@@ -26,12 +26,10 @@ export default function clientMiddleware(client) {
  //对于redux的middleware来说：第一级别传入dispath和getState,第二级别传入store.dispatch,第三级别传入action即可
   return ({dispatch, getState}) => {
     return next => action => {
+      // console.log("action====",action);
       //支持action是一个函数,即发出异步请求https://github.com/liangklfang/redux-thunk/blob/master/src/index.js
       //http://www.ruanyifeng.com/blog/2016/09/redux_tutorial_part_two_async_operations.html
       if (typeof action === 'function') {
-
-        console.log("+++++++++++++++++++++++++++++++++++++++++++");
-
         return action(dispatch, getState);
       }
       // console.log("actions---->",action);
