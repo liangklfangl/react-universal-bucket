@@ -6,7 +6,8 @@ import {
     Home,
     Login,
     LoginSuccess,
-    Widget
+    Widget,
+    Pagination
   } from './containers';
 //getRoutes(store)
 export default (store) => {
@@ -43,6 +44,10 @@ export default (store) => {
            {
             path:"loginsuccess",
             component:Login
+          },
+          {
+            path:"pagination",
+            component:Pagination
           },
            {
             path:"widget",

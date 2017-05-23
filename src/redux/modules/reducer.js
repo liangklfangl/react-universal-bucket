@@ -6,22 +6,31 @@ import multireducer from 'multireducer';
 import { routerReducer } from 'react-router-redux';
 import {reducer as reduxAsyncConnect} from 'redux-async-connect';
 // https://github.com/liangklfang/redux-async-connect
-import { pagination } from 'violet-paginator';
+import { createPaginator } from 'violet-paginator'
 // https://github.com/liangklfang/violet-paginator
-
 import auth from './auth';
 import counter from './counter';
 import {reducer as form} from 'redux-form';
 import info from './info';
 import widgets from './widgets';
-
+import connect from './paginator/connected';
+//判断是否链接上了服务端，进而判断是否显示遮罩层
+import fetch from './paginator/fetch';
 //https://www.npmjs.com/package/react-router-redux
 //https://zhuanlan.zhihu.com/p/21648398?refer=turborender
+//(1)你必须知道，当你dispatch一个action的时候，其实会遍历这个combineReducers中所有的key
+//比如这里有routing,reduxAsyncConnect,auth,form,multireducer,info,pagination,widgets这些
+//key，那么dispatch一个action为{type:'redux-example/auth/LOAD_SUCCESS'}那么会遍历所有的key
+//对应的reducer进行处理,其中源码中for循环从0开始就可以看出来:https://github.com/liangklfangl/redux-createstore
+//(2)你要知道上面说的for循环，其实每次传入的都是 var previousStateForKey = state[key]
+//   也就是说传入下面的connect方法的state对象其实就是一个object即{connectd:false}或者{connected:true}
+//   注意，此时不是immutable对象，而要在createStore中的if(data)中做判断
 export default combineReducers({
   routing: routerReducer,
-  //react-router-redux的routerReducer必须在combineReducers里面，同时key必须是routing
+  //(1)react-router-redux的routerReducer必须在combineReducers里面，同时key必须是routing
   //保证history,location,store同步更新，支持时间旅行
   reduxAsyncConnect,
+  //(2)redux-async-connect用于先获取数据然后保存到store中
   auth,
   //通过redux-form的中间件来处理
   form,
@@ -32,6 +41,14 @@ export default combineReducers({
     counter3: counter
   }),
   info,
-  pagination,
+  connect ,
+  // //是否显示遮罩层的state判断
+  recipeGrid: createPaginator({
+    listId: 'recipeGrid',
+    fetch
+  }),
+  //fetch表示获取服务器数据的方法，listId用于UI组件
+ //https://sslotsky.gitbooks.io/violet-paginator/content/v/v1.9.1/
+ //1.9.1版本以后无法这样直接使用
   widgets
 });

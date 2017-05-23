@@ -39,6 +39,10 @@ export default class Html extends Component {
           {head.link.toComponent()}
           {head.script.toComponent()}
           <link rel="shortcut icon" href="/favicon.ico" />
+         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"/>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Work+Sans:400,500"/>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/violet/0.0.1/violet.min.css"/>
+
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           {/* styles (will be present only in production with webpack extract text plugin)
              styles属性只有在生产模式下才会存在，此时通过link来添加。便于缓存

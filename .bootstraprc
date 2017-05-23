@@ -1,6 +1,7 @@
 ---
 # Output debugging info
-loglevel: debug
+# loglevel: debug
+loglevel: disabled
 
 # Major version of Bootstrap: 3 or 4
 bootstrapVersion: 3

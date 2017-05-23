@@ -33,6 +33,9 @@ export default class Header extends React.Component{
 			        	 <NavItem eventKey={2} href="#">登录</NavItem>
 			        	</LinkContainer>
 			        }
+			        <LinkContainer to="/pagination">
+			        	 <NavItem eventKey={2} href="#">分页</NavItem>
+			        	</LinkContainer>
 			        <NavDropdown eventKey={3} title="更多" id="basic-nav-dropdown">
 			          <MenuItem eventKey={3.1}>Action</MenuItem>
 			          <MenuItem eventKey={3.2}>Another action</MenuItem>

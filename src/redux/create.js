@@ -72,7 +72,11 @@ export default function createStore(history, client, data) {
   //这里的data是服务端传递的store.getState，即应用的完整的state状态。所以你可以通过
   //combineReducer得到操作的结果
   if (data) {
-    data.pagination = Immutable.fromJS(data.pagination);
+    //data.pagination = Immutable.fromJS(data.pagination);
+     data.recipeGrid = Immutable.fromJS(data.recipeGrid);
+     //这里必须设置，否则报错说:paginator.equals is not a function
+     //这里是用于客户端创建store的情况。一定要记得在html中加入pagination的三个link标签
+      data.connect = Immutable.fromJS(data.connect);
   }
   const store = finalCreateStore(reducer, data);
   // createStore(reducer, [preloadedState], [enhancer])

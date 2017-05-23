@@ -1,6 +1,6 @@
 {
   "javascript": {
-    "main": "http://localhost:8091/dist/main-8ad1329ee2a7c61a675f.js"
+    "main": "http://localhost:8091/dist/main-aba8859db7b74e92c3a3.js"
   },
   "styles": {},
   "assets": {
@@ -20,6 +20,9 @@
     },
     "./src/containers/login/index.less": {
       "_style": ".submit{display:inline-block;with:50px;height:30px;position:relative}.form-content{padding:50px 10px}"
+    },
+    "./src/containers/Pagination/index.less": {
+      "_style": ".pagination,.thead th{text-align:center}"
     }
   }
 }

@@ -21,12 +21,12 @@ const styles = require("./index.less");
 //   load
 // })
 
-@connect((state)=>{
+@connect((state)=>({
   info: state.info.data
-},(dispatch)=>{
+}),(dispatch)=> {
  //bindActionCreators第一个参数对象中的key在被connect过的组件中都是通过this.props来获取到的
  //然后直接调用
-  bindActionCreators({load},dispatch)
+  return bindActionCreators({load},dispatch)
 })
 /**
  * 该组件由Login组件调用，而Login组件的上一级组件是App

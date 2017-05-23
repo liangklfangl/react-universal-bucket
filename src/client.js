@@ -16,6 +16,7 @@ const client = new ApiClient();
 const dest = document.getElementById('content');
 const store = createStore(browserHistory, client, window.__data);
 //其中window.__data表示的是服务器端传递过来的sotre的状态，通过它来构建出客户端的store
+//此时watch-client打包的时候，此处__CIENT__为true，表示客户端代码
 //window.__data=${serialize(store.getState())};
 // const store = createStore(_browserHistory, client, window.__data);
 // const history = syncHistoryWithStore(_browserHistory, store);

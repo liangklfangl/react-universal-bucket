@@ -7,7 +7,7 @@ const webpackConfig = require("./webpack.dev.config.js")(customConfigPath);
 const util = require("util");
 const path = require("path");
 const webpack = require("webpack");
-console.log(util.inspect(webpackConfig,{showHidden:true,depth:3}));
+// console.log(util.inspect(webpackConfig,{showHidden:true,depth:3}));
 // const output = path.join(__dirname, '../dist').replace(/\\/g, '/');
 // console.log("webpack打包完成",output);
 // webpackConfig.output.path=(process.cwd().replace(/\\/g, '/')+"/build");
@@ -23,6 +23,7 @@ const serverOptions = {
   lazy: false,
   publicPath: webpackConfig.output.publicPath,
   // headers: {'Access-Control-Allow-Origin': '*'},
+  // 为什么存在跨域问题？
   stats: {colors: true}
 };
 const app = new Express();
