@@ -32,7 +32,8 @@ export default combineReducers({
   reduxAsyncConnect,
   //(2)redux-async-connect用于先获取数据然后保存到store中
   auth,
-  //通过redux-form的中间件来处理
+  //(3)对于我们的combineReducer中每一个key对应的函数都只会传入我们的相应的key对应的state部分
+  //其中看到我们的for循环就知道原因了
   form,
   //multireducer里面的key不同，但是value都是同一个counter
   multireducer: multireducer({

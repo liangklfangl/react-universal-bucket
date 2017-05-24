@@ -5,7 +5,7 @@ import {LinkContainer} from "react-router-bootstrap";
 import NavItem from 'react-bootstrap/lib/NavItem';
 import NavDropdown from "react-bootstrap/lib/NavDropdown";
 import MenuItem from "react-bootstrap/lib/MenuItem";
-//bootstrap的组件实例
+//react-bootstrap与react-router-bootstrap一起完成
 const styles = require("./index.less");
 export default class Header extends React.Component{
 	render(){
@@ -23,6 +23,9 @@ export default class Header extends React.Component{
 			    <Navbar.Collapse>
 			      <Nav>
 					<NavItem eventKey={1} href="#">聊天</NavItem>
+				      {/*这个NavItem会react-router-bootstrap的LinkContainer包裹
+                        从而发生URL跳转
+				      */}
 					<LinkContainer to="/widget">
 			          <NavItem eventKey={1} href="#">Widget</NavItem>
 			        </LinkContainer>

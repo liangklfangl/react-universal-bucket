@@ -13,6 +13,14 @@ const initialState = {
   saveError: {}
 };
 
+/**
+ * 这里是我们的widget对应的reducer,每一个reducer都会接收一个state和action。
+ * 而这个文件中，其他的方法都是会作为mapDispatchToProps，而发出一个action
+ * 最后这个action会被clientMiddleware处理
+ * @param  {[type]} state  [description]
+ * @param  {Object} action [description]
+ * @return {[type]}        [description]
+ */
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
     case LOAD:
@@ -20,23 +28,35 @@ export default function reducer(state = initialState, action = {}) {
         ...state,
         loading: true
       };
+    //如果action为LOAD_SUCCESS，
     case LOAD_SUCCESS:
-      return {
+      const success= {
         ...state,
         loading: false,
         loaded: true,
         data: action.result,
         error: null
       };
+      // console.log("reducers中的success返回的对象为:",success);
+      return success;
+    //(1)其中error是一个对象，是我们通过superagent发送请求到服务端后返回的错误对象
+    // next({...rest, error, type: FAILURE})
+    // 此时通过该reducer我们计算得到一个新的state状态，这个state状态维持的是combineReducer中
+    // widget部分的state,它会和其他的部分组合在一起，进而得到组合后的最终state对象，然后将
+    // 根据这个state来重新渲染各级组件
     case LOAD_FAIL:
-      return {
+      const err= {
         ...state,
         loading: false,
         loaded: false,
         data: null,
         error: action.error
       };
+    // console.log("reducers中的err返回的对象为:",err);
+      return err;
     case EDIT_START:
+     //此时只是将我们的state中添加了editing属性而已，并将该id(dispatch的这个action有额外的id值)对应的
+     //值设置为true。其中...state.editing就是将原来的key值原样保存而已，此时state就会发生变化
       return {
         ...state,
         editing: {
@@ -82,7 +102,9 @@ export default function reducer(state = initialState, action = {}) {
   }
 }
 /**
- * isLoaded传入我们一个全局的globalState，判断auth与auth.loaded属性
+ * isLoaded传入我们store中的state的一个副本，然后如果我们以前已经dispatch了一个
+ * 行为，如下面的load方法，此时我们肯定会经历LOAD_SUCCESS,进而操作我们的reducer,
+ * 最后导致我们的widget.loaded属性为true,从而表示已经load过一次数据了
  * @param  {[type]}  globalState [description]
  * @return {Boolean}             [description]
  */
@@ -116,11 +138,26 @@ export function save(widget) {
     })
   };
 }
-
+/**
+ * (1)这里很显然，如果我们的mapDispatchToProps返回的是一个对象，那么这个key对应的就是一个
+ * 函数，此时当你调用这个函数，就相当于直接将函数的返回值dispatch出去了，而且此时不会被
+ * clientMiddleware拦截，因为它会有如下的判断：
+ *    if (!promise) {
+        return next(action);
+      }
+   所以直接会到reducer中进行处理,也就是这个文件中的reducer函数
+ * @param  {[type]} id [description]
+ * @return {[type]}    [description]
+ */
 export function editStart(id) {
   return { type: EDIT_START, id };
 }
 
+/**
+ * 结束编辑
+ * @param  {[type]} id [description]
+ * @return {[type]}    [description]
+ */
 export function editStop(id) {
   return { type: EDIT_STOP, id };
 }

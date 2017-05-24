@@ -1,6 +1,6 @@
 {
   "javascript": {
-    "main": "http://localhost:8091/dist/main-863881f8381b1ad889c0.js"
+    "main": "http://localhost:8091/dist/main-545a058c8dc35a8613ff.js"
   },
   "styles": {},
   "assets": {
@@ -20,6 +20,9 @@
     },
     "./src/containers/Pagination/index.less": {
       "_style": ".pagination,.thead th{text-align:center}"
+    },
+    "./src/containers/Widget/index.less": {
+      "_style": ""
     },
     "./src/containers/login/index.less": {
       "_style": ".submit{display:inline-block;with:50px;height:30px;position:relative}.form-content{padding:50px 10px}"

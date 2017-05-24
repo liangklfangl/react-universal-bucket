@@ -32,10 +32,10 @@ export default function clientMiddleware(client) {
       if (typeof action === 'function') {
         return action(dispatch, getState);
       }
-      // console.log("actions---->",action);
       const { promise, types, ...rest } = action;
       //得到action中的promise, types等属性,如果promise为空，那么直接调用
       //下一个中间件middleware,只有当有promise的时候才调用这个middleware
+      //rest表示如发送到服务器端的id数据等
       if (!promise) {
         return next(action);
       }
@@ -45,6 +45,9 @@ export default function clientMiddleware(client) {
       //执行请求
       const actionPromise = promise(client);
       //执行我们的client,此时是一个ApiClient实例
+      //(1)这里表示我们发送一个请求到服务端去，如果成功，那么会获取到获取到服务端返回的数据，同时type为SUCCSS
+      //如果失败，那么我们发布FAILURE，同时我们这里的next表示我们dispatch这个action出去，同时action也携带了数据
+      //然后我们的reducer会真实接收到数据
       actionPromise.then(
         function(result){
           console.log("clientMiddleware服务端得到数据",result);
