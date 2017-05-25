@@ -19,9 +19,9 @@ export default function update(req) {
             });
           }
           if (widget.id) {
+            console.log("服务端更新widget的id为:",widget.id);
             widgets[widget.id - 1] = widget;  
-            //从request.body中获取到wiget来更新request.session中的wiget
-            // id is 1-based. please don't code like this in production! :-)
+            //根据id来更新widget
             req.session.widgets = widgets;
           }
           resolve(widget);

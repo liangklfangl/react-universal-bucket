@@ -40,7 +40,7 @@ const styles = require("./index.less");
 
 @connect(
   state => {
-    console.log("connect中的state为:",state);
+    // console.log("connect中的state为:",state);
     //上面@asyncConnect发送请求出去没有将state传递到这里来
     return {
        widgets: state.widgets.data,

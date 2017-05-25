@@ -130,6 +130,7 @@ export function load() {
  * @return {[type]}        [description]
  */
 export function save(widget) {
+  console.log("保存widget为:",widget);
   return {
     types: [SAVE, SAVE_SUCCESS, SAVE_FAIL],
     id: widget.id,
@@ -150,6 +151,7 @@ export function save(widget) {
  * @return {[type]}    [description]
  */
 export function editStart(id) {
+  console.log("开始编辑widget的id为:",id);
   return { type: EDIT_START, id };
 }
 
