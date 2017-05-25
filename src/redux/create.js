@@ -77,6 +77,7 @@ export default function createStore(history, client, data) {
      //这里必须设置，否则报错说:paginator.equals is not a function
      //这里是用于客户端创建store的情况。一定要记得在html中加入pagination的三个link标签
       data.connect = Immutable.fromJS(data.connect);
+     //可以使用https://github.com/liangklfang/redux-immutablejs
   }
   const store = finalCreateStore(reducer, data);
   // createStore(reducer, [preloadedState], [enhancer])

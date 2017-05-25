@@ -113,7 +113,7 @@ export default class Widget extends React.Component{
                          <td>{widget.color}</td>
                          <td>{widget.sprocketCount}</td>
                          <td>{widget.owner}</td>
-                         <td className={styles.buttonCol}>
+                         <td>
                           <button className="btn btn-primary" onClick={this.handleEdit(widget)}>
                             <i className="fa fa-pencil"/> 编辑
                           </button>
