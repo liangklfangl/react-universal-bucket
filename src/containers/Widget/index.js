@@ -107,7 +107,7 @@ export default class Widget extends React.Component{
                 {/*箭头函数如果返回一个对象必须要小括号包裹，否则不需要*/}
                 {
                    widgets.map((widget)=>
-                    editing[widget.id] ? <WidgetForm formKey={String(widget.id)} key={String(widget.id)} initialValues={widget}/> :
+                    editing[widget.id] ? <WidgetForm form={widget.id+""} key={String(widget.id)} initialValues={widget}/> :
                        <tr key={widget.id}>
                          <td>{widget.id}</td>
                          <td>{widget.color}</td>

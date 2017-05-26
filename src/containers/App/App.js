@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from 'prop-types';
+import Perf from 'react-addons-perf';
 import { asyncConnect } from 'redux-async-connect';
 import { isLoaded as isInfoLoaded, load as loadInfo } from '../../redux/modules/info';
 //渲染页面之前得到数据,isLoaded判断如下:return globalState.info && globalState.info.loaded;
@@ -25,6 +26,7 @@ import { connect } from 'react-redux';
 import { push } from 'react-router-redux';
 import Header from "../../components/Header/index";
 import Footer from "../../components/Footer/index";
+Perf.start();
 // const styles = require("./App.less");
  //(1)延缓容器的渲染直到异步的请求结束
  //(2)保存数据到store中，同时将加载的数据connect到你的容器中~
@@ -161,3 +163,4 @@ export default class App extends React.Component{
 			)
 	}
 }
+Perf.stop();
