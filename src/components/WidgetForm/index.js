@@ -54,7 +54,7 @@ export default class WidgetForm extends React.Component{
   }
 
   render(){
-    const {submitting, handleSubmit, pristine, invalid, saveWidget, editStop} = this.props;
+    const {submitting, handleSubmit, pristine, invalid, saveWidget, editStop,form} = this.props;
     /*(1)submitting表示表单是否在提交，只有当你传入了一个onSubmit函数同时该函数返回一个promise的时候有用
     在这个promise处于reject/resolve之前，submitting一直为true
     (2)handleSubmit是一个函数，默认会传入到props中。用于下面两种情况
@@ -75,6 +75,10 @@ export default class WidgetForm extends React.Component{
        而在clietMiddleware中调用promise方法，返回了actionPromise是一个promise对象
     (5)我们调用handleSubmit中传入的函数其实是onSubmit,redux-form会将当前的值values全部
        传入到这个函数中
+    (6)只要在保存修改的时候handleSubmit
+    (7)我们的key是保持的就是这个widget的id，我们会通过action发送过去，因为我们会调用editStop
+       需要这个widget.id。但是key是用于React本身的虚拟DOM比较的，不会在this.props.key上
+       所以这里我们通过this.props.form来获取
     */
   	return (
            <tr>
@@ -92,7 +96,13 @@ export default class WidgetForm extends React.Component{
                  </td>
                   <td>
                     <button className="btn btn-default"
-                            disabled={submitting} >
+                            disabled={submitting} onClick={
+                              editStop.bind(this,form)
+                            } >
+                      {/*这里不能是onClick={editStop(form)}，因为react会提前执行onClick
+                         函数句柄：http://blog.csdn.net/liangklfang/article/details/53694994
+                         进而导致在render里面修改了store的值，进而导致元素又render了
+                     */}
                       <i className="fa fa-ban"/> 取消
                     </button>
                     <button onClick={handleSubmit((values)=>{saveWidget(values).then(result=>{
@@ -103,7 +113,7 @@ export default class WidgetForm extends React.Component{
                       }
                     })})} className="btn btn-success" disabled={pristine || invalid || submitting}>
                       <i className={'fa ' + (submitting ? 'fa-cog fa-spin' : 'fa-cloud')}/> 保存
-                    </button>
+                   </button>
                 </td>
             </tr>
   		)

@@ -124,6 +124,7 @@ export default class App extends React.Component{
   //这是最上层的组件，他会接受到Provider的store中的所有内容，然后逐级传递下去用于组件更新。每次
   //store发生变化都会重新渲染组件树，这是我们使用一个store来管理组件状态的好处!!!!
   //登陆后我们的nextProps结构见output/App-nextProps.PNG
+  //componentWillReceiveProps只会在客户端渲染的时候调用
   componentWillReceiveProps(nextProps){
     //表示登录loginSuccess
     if(!this.props.user && nextProps.user){

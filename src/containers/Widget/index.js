@@ -5,8 +5,10 @@ import {load as loadWidgets,save, editStart} from "../../redux/modules/widgets";
 import { asyncConnect } from 'redux-async-connect';
 import { isLoaded } from "../../redux/modules/widgets";
 import Helmet from 'react-helmet';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import {connect} from "react-redux";
 import WidgetForm from "../../components/WidgetForm";
+import MaterialUiDialog from "./MaterialUiDialog";
 const styles = require("./index.less");
 //(3)当你进入该页面的时候，我们会保证所有的数据都加载完成才渲染这个页面。但是我们有时候为了
 //页面跳转在前，而加载数据在跳转行为之后发生，我们可以提供一个defer参数。App.js组件中是先加载数据
@@ -55,6 +57,7 @@ const styles = require("./index.less");
  */
 export default class Widget extends React.Component{
 
+
  /**
   *(1) 每一个tr显示的是一个Widget，这里就是对该Widget进行编辑，当你编辑的时候很显然
   * 是dispatch一个action到服务器端，然后修改了state状态。此时我们的editStart其实
@@ -80,6 +83,7 @@ export default class Widget extends React.Component{
   }
 
   render(){
+  
    const {widgets, error, editing, loading} = this.props;
    //获取到store中当前的wigets信息
    const { load, save } = this.props;
@@ -117,6 +121,7 @@ export default class Widget extends React.Component{
                           <button className="btn btn-primary" onClick={this.handleEdit(widget)}>
                             <i className="fa fa-pencil"/> 编辑
                           </button>
+                          <MaterialUiDialog/>
                          </td>
                       </tr>
                   )

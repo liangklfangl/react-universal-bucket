@@ -64,6 +64,7 @@ export default function reducer(state = initialState, action = {}) {
           [action.id]: true
         }
       };
+    //EDIT_STOP的action就是将我们的某一个元素的editting设置为false
     case EDIT_STOP:
       return {
         ...state,
@@ -161,5 +162,6 @@ export function editStart(id) {
  * @return {[type]}    [description]
  */
 export function editStop(id) {
+    console.log("停止编辑widget的id为:",id);
   return { type: EDIT_STOP, id };
 }

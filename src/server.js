@@ -139,6 +139,8 @@ app.use((req, res) => {
             <ReduxAsyncConnect {...renderProps} />
           </Provider>
         );
+          //这里不是 <RouterContext {...renderProps} />
+            //https://zhuanlan.zhihu.com/p/22875338
         res.status(200);
         global.navigator = {userAgent: req.headers['user-agent']};
         //正确发送到客户端,你会发现这里的Html组件是有一个component的，而
