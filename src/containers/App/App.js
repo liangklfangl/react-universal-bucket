@@ -33,7 +33,12 @@ Perf.start();
  //也就是说，在加载这个页面之前我们要获取到所有的/loadInfo等以及用户是否登录等信息
  //获取到之后才会真正渲染页面~~~
 @asyncConnect([{
-  promise: ({store: {dispatch, getState}}) => {
+  promise: ({store: {dispatch, getState},helpers}) => {
+    // loadOnServer({...renderProps, store, helpers: {client}})
+    // 这部分代码在服务端执行，是服务端在内网发送的ajax请求，因此没有filter属性，loadOnServer中不存在filter
+    // 因此这里我们的promise函数中可以获取到helpers对象，其是一个{client:{ApiClient}}
+    console.log("App的@asyncConnect中的filter,helpers",filter);
+        console.log("App的@asyncConnect中的filter,helpers",helpers);
   //里面无法直接访问store，否则报错，里面调用getState得到的值参见
   //getState.js
   const promises = [];
@@ -135,6 +140,7 @@ export default class App extends React.Component{
     }
   }
 	render(){
+    console.log("App里面接收到props",this.props);
     const {user} = this.props;
 	//总结一下，state对象的结构由传入的多个reducer的key决定，可以根据
 	//模块拆分的细粒度，考虑是否需要嵌套使用combineReducers

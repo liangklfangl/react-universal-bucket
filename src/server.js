@@ -67,7 +67,6 @@ server.on('upgrade', (req, socket, head) => {
   proxy.ws(req, socket, head);
 });
 proxy.on('error', (error, req, res) => {
-  console.log("res内部的东西",res);
   let json;
   if (error.code !== 'ECONNRESET') {
     console.error('proxy error', error);
@@ -133,6 +132,23 @@ app.use((req, res) => {
       //const store = createStore(combineReducers({reduxAsyncConnect}));
       //在reducer中完成，也就是说这个异步请求可以操作数据库。reducer是用于操作数据库
       //这里的helpers是干嘛？其是一个ApiClient对象?
+      //(3)其实这里在loadOnServer中使用helpers属性的作用在于将我们的ApiClient对象传递到
+      //下级的组件中,以后我们可以直接访问了在@asyncConnect的promise方法中
+      //@asyncConnect([{
+      //promise: ({store: {dispatch, getState},helpers}) => {
+      //   在这里我们就可以直接访问我们的helpers方法了，也就是我们的ApiClient对象，其签名如下
+      //}
+      //}]
+      //{ client:
+      // ApiClient {
+      //   get: [Function],
+      //   post: [Function],
+      //   put: [Function],
+      //   patch: [Function],
+      //   del: [Function] 
+      //  } 
+      //}
+
       loadOnServer({...renderProps, store, helpers: {client}}).then(() => {
         const component = (
           <Provider store={store} key="provider">

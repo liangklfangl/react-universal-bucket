@@ -34,11 +34,8 @@ module.exports = {
     filename: '[name]-[chunkHash].js',
      publicPath: '/dist/'
   },
-
   // devtool: '#cheap-module-eval-source-map',
-
   resolve: { extensions: ['*', '.js'] },
-
   module: {
     rules: [
       {
