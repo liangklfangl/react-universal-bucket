@@ -8,7 +8,7 @@ npm run dev
 //开发模式下运行下面的命令
 //npm run pro
 ```
-打开http://localhost:3222/就可以看到效果。项目截图如下：
+打开http://localhost:3222/ 就可以看到效果。项目截图如下：
 
 ![](./images/project.PNG)
 
