@@ -16,13 +16,16 @@ export default class Header extends React.Component{
 			   <Navbar inverse collapseOnSelect>
 			    <Navbar.Header>
 			      <Navbar.Brand>
-			        <a href="#">React全家桶实例</a>
+			        <a href="/">React全家桶实例</a>
 			      </Navbar.Brand>
 			      <Navbar.Toggle />
 			    </Navbar.Header>
 			    <Navbar.Collapse>
 			      <Nav>
-					<NavItem eventKey={1} href="#">聊天</NavItem>
+			       <LinkContainer to="/">
+			          <NavItem eventKey={1} href="#">首页</NavItem>
+			        </LinkContainer>
+					 {/*<NavItem eventKey={1} href="#">聊天</NavItem>*/}
 				      {/*这个NavItem会react-router-bootstrap的LinkContainer包裹
                         从而发生URL跳转
 				      */}

@@ -77,7 +77,8 @@ proxy.on('error', (error, req, res) => {
   json = {error: 'proxy_error', reason: error.message};
   res.end(JSON.stringify(json));
 });
-//这里是Express中间件，所以要有客户端请求才会执行
+//注意：这里是Express中间件，所以要有客户端请求才会执行。也就是告诉我们服务端渲染的组件树的
+//结构和用户在地址栏输入的URL有关!!!
 app.use((req, res) => {
   if (__DEVELOPMENT__) {
     // 如果是开发环境，我们不要缓存webpack的stats,因为资源在开发环境中启动了HMR
@@ -88,7 +89,11 @@ app.use((req, res) => {
   const client = new ApiClient(req);
   //此时client有['get', 'post', 'put', 'patch', 'del']实例方法
   const memoryHistory = createMemoryHistory(req.originalUrl);
-  //通过URL得到一个历史记录,memoryHistory是服务器渲染的基础
+  //通过URL得到一个历史记录,memoryHistory是服务器渲染的基础。该地址不需要从地址栏读取
+  //也可用于代码测试或者其他渲染环境，比如React Native，和其他的hashHistory,browserHistory
+  //不同的是，你需要手动创建一个history(其他的是浏览器创建的)。为什么维持这个history原因可能是
+  // 服务端渲染一次后可以回到前一次渲染的结果，而不用重新渲染
+  //http://zhenhua-lee.github.io/react/history.html
   const store = createStore(memoryHistory, client);
   //注意：我们的store是依赖于memoryHistory的，因为store要根据浏览器历史来得到正确的消息
   //同时我们的store也与ApiClient有关，后者用于服务器端发送Get/post等请求

@@ -85,6 +85,11 @@ configurePageParams({
        
                 <VioletDataTable listId="recipeGrid" headers={this.headers()} />
                  <VioletPaginator listId="recipeGrid"  />
+                  <h3>这个页面你可以学习:</h3>
+                  <div>react-redux</div>
+                  <div>violet-paginator</div>
+                  <div>react-router</div>
+                  <div>.......</div>
               </div>
 			)
 	}

@@ -67,6 +67,14 @@ export default class Login extends React.Component{
                  </div>
               }
               <InfoBar/>
+              <h3>这个页面你可以学习:</h3>
+              <div>react-helmet</div>
+              <div>react-redux</div>
+              <div>express-session</div>
+              <div>express</div>
+              <div>body-parser</div>
+              <div>socket.io</div>
+              <div>.......</div>
               {/*如果用户已经登录，来到登录模块，我们直接显示用户名*/}
               {
               	user && <div>

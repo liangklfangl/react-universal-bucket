@@ -129,7 +129,13 @@ export default class Widget extends React.Component{
               </tbody>
              </table>
             }
-           <button onClick={load}>加载widget</button>
+            <h3>这个页面你可以学习</h3>
+            <div>material-ui</div>
+            <div>redux-async-connect</div>
+            <div>react-tap-event-plugin</div>
+            <div>redux-form</div>
+            <div>......</div>
+           <button onClick={load}>重新加载widget</button>
          </div>
       )
   }
