@@ -38,7 +38,7 @@ Perf.start();
     // 这部分代码在服务端执行，是服务端在内网发送的ajax请求，因此没有filter属性，loadOnServer中不存在filter
     // 因此这里我们的promise函数中可以获取到helpers对象，其是一个{client:{ApiClient}}
     // console.log("App的@asyncConnect中的filter,helpers",filter);
-        console.log("App的@asyncConnect中的filter,helpers",helpers);
+    // console.log("App的@asyncConnect中的filter,helpers",helpers);
   //里面无法直接访问store，否则报错，里面调用getState得到的值参见
   //getState.js
   const promises = [];
