@@ -140,7 +140,7 @@ export default class App extends React.Component{
     }
   }
 	render(){
-    console.log("App里面接收到props",this.props);
+    // console.log("App里面接收到props",this.props);
     const {user} = this.props;
 	//总结一下，state对象的结构由传入的多个reducer的key决定，可以根据
 	//模块拆分的细粒度，考虑是否需要嵌套使用combineReducers

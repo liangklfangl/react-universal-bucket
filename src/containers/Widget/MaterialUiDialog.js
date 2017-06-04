@@ -52,7 +52,7 @@ export default class MaterialUiDialog extends React.Component{
   	 return (
   	  <MuiThemeProvider muiTheme={muiTheme}>
            <div>
-              <RaisedButton label="Modal Dialog" onTouchTap={this.handleOpen} />
+              <RaisedButton label="删除" onTouchTap={this.handleOpen} />
               <Dialog
                 title="删除"
                 actions={actions}

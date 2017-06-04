@@ -29,8 +29,13 @@ export default class Header extends React.Component{
 					<LinkContainer to="/widget">
 			          <NavItem eventKey={1} href="#">Widget</NavItem>
 			        </LinkContainer>
-			        <NavItem eventKey={2} href="#">Survey</NavItem>
-			        <NavItem eventKey={2} href="#">关于我们</NavItem>
+			        <LinkContainer to="/counter">
+			          <NavItem eventKey={2} href="#">计数器</NavItem>
+			        </LinkContainer>
+			        {/*
+                          <NavItem eventKey={2} href="#">Survey</NavItem>
+			        */}
+	
 			        {
 			        	!user&&<LinkContainer to="/login">
 			        	 <NavItem eventKey={2} href="#">登录</NavItem>
