@@ -1,6 +1,11 @@
-自已以前对redux,react,rect-redux,react-router都是有一点的了解，但是不足的地方在于没有做一个demo将他们串起来,所以总是感觉似懂非懂。所以我最后写了这个例子，希望有同样困扰的同学能够有所收益。也欢迎star,issue
+### 写在前面的话
+自已以前对redux,react,rect-redux,react-router都是有一点的了解，并且在真实的项目中也多少有些涉及。但是不足的地方在于没有做一个demo将他们串起来,所以总是感觉似懂非懂。特别是react服务端渲染这一块，对于自己完全就是一个黑箱，这对我深入理解react同构等稍微难一点的内容产生了很大的影响。所以我最后写了这个例子，希望有同样困扰的同学能够有所收获。也欢迎star,issue。
 
-### 1.项目效果
+不得不说，当你真实的去做一个项目的时候，哪怕是一个小小的demo，这都会完全颠覆你对React生态的认识。从一开始的不知道如何入手，到遇到各种困难，然后各种google，最后解决问题，你会发现自己是真的在成长。遇到的问题以及解决方案，我在文章列表中也给出了。时间+经历=成长，对于我来说就够了。默默的对自己说一句，加油把少年!
+
+### 1.项目说明
+克隆该项目，然后直接运行就可以了。
+
 ```js
 git clone https://github.com/liangklfangl/react-universal-bucket.git
 npm install 
@@ -12,12 +17,12 @@ npm run dev
 
 ![](./images/project.PNG)
 
-
 ### 2.项目基本知识点
 #### 2.1 代理与反代理的基本内容
 使用http-proxy来完成。其反向代理的原理如下图：
 
 ![](./images/reverse-server.PNG)
+
 通过如下代码完成，其相当于一个反向代理服务器，向我们的代理服务器，即API服务器发送请求:
 ```js
 const targetUrl = 'http://' + (process.env.APIHOST||"localhost") + ':' + (process.env.APIPORT||"8888");
@@ -227,5 +232,109 @@ const BookList = connectPromise({
 ```
 你应该很容易就看出来了，对于这种列表类型的高阶组件抽象是相当成功的。我们只需要关注重要的代码逻辑，在componentDidMount请求数据结束后我们会自动调用setState来完成组件状态的更新，而*真实的更新的组件却是我们通过自己的业务逻辑来指定的*,可以是BookList,UserList,**List等等。这样具有副作用的高阶组件复用也就完成了。如果你需要深入了解高阶组件的内容，请[查看我的这篇文章](https://github.com/liangklfangl/high-order-reducer)。在该项目中我们使用了[multireducer](./src/redux/modules/reducer.js)
 
-### 3.你能够学到的东西
-内部所有的代码都有详细的注释，而且都给出了代码相关说明的链接。通过这个项目，对于react*全家桶*应该会有一个深入的了解。该项目牵涉到了常见的React生态中的库，因此命名为全家桶。如果你有不懂的地方，也可以通过github上的邮箱联系我。希望我们能够共同进步
+
+### 3.React全家桶文章总结
+关于该项目中使用到的所有的react相关知识点我都进行了详细总结。但是很显然，如果你要学习react，必须对webpack和babel都进行一定的了解。因为在写这个项目之前，我只是一个react/webpack/babel的新手，因此也是在不断的学习中摸索前进的。遇到了问题就各种google,baidu。而且我对于自己有一个严格的要求，那就是要知其然而且要知其所以然，因此我会把遇到的问题都进行深入的分析。下面我把我在写这个项目过程遇到问题，并作出的总结文章贴出来，希望对您有帮助。我也希望您能够关注每一篇文章下面的参考文献，因为他们确实都是非常好的参考资料。
+
+#### 3.1 React+redux相关
+
+[React高阶组件详解](https://github.com/liangklfangl/high-order-reducer)
+
+[React同构你了解多少以及常用问题](https://github.com/liangklfangl/react-static-ajax)
+
+[renderProps签名与React服务端渲染](https://github.com/liangklfangl/react-router-renderProps)
+
+[React的material-ui学习实例](https://github.com/liangklfangl/material-ui-webpack-demo)
+
+[react的context困境与解决方法](https://github.com/liangklfangl/react-context-demo)
+
+[redux-form的使用实例](https://github.com/liangklfangl/redux-form-demo)
+
+[redux的原理浅析](https://github.com/liangklfangl/redux-createstore)
+
+[使用react组件的ref回调函数](https://github.com/liangklfangl/react-ref)
+
+[react-redux服务端渲染的一个完整例子](https://github.com/liangklfang/universal-react-demo)
+
+#### 3.2 webpack相关
+
+[webpack-dev-server原理分析](https://github.com/liangklfangl/webpack-dev-server)
+
+[webpack热加载HMR深入学习](https://github.com/liangklfangl/webpack-hmr)
+
+[集成webpack,webpack-dev-server的打包工具](https://github.com/liangklfangl/wcf)
+
+[prepack与webpack对比](https://github.com/liangklfangl/prepack-vs-webpack)
+
+[webpack插件书写你需要了解的知识点](https://github.com/liangklfangl/webpack-common-sense)
+
+[CommonsChunkPlugin深入分析](https://github.com/liangklfangl/commonchunkplugin-source-code)
+
+[CommonsChunkPlugin配置项深入分析](https://github.com/liangklfangl/commonsChunkPlugin_Config)
+
+[webpack.DllPlugin提升打包性能](https://github.com/liangklfangl/webpackDll)
+
+[webpack实现code splitting方式分析](https://github.com/liangklfangl/webpack-code-splitting)
+
+[webpack中的externals vs libraryTarget vs library](https://github.com/liangklfangl/webpack-external-library)
+
+[webpack的compiler与compilation对象](https://github.com/liangklfangl/webpack-compiler-and-compilation)
+
+[webpack-dev-middleware原理分析](https://github.com/liangklfang/webpack-dev-middleware)
+
+#### 3.3 Babel相关
+
+[Babel编译class继承与源码打包结果分析](https://github.com/liangklfangl/babel-compiler-extends)
+
+[使用babel操作AST来完成某种特效](https://github.com/liangklfangl/astexample)
+
+[babylon你了解多少](https://github.com/liangklfangl/babylon)
+
+#### 3.4 其他内容
+
+[bootstrap-loader自定义bootstrap样式](https://github.com/liangklfangl/bootstrap-loader-demo)
+
+[前端工程师那些shell命令学习](https://github.com/liangklfangl/shellGlobStar)
+
+[npm环境变量与常见命令](https://github.com/liangklfangl/npm-command)
+
+[npm中script生命周期方法的深入探讨](https://github.com/liangklfangl/devPlusDependencies)
+
+[npm version与npm dist tag详解](https://github.com/liangklfangl/npm-dist-tag)
+
+[linux中软链接与硬链接的区别学习](https://github.com/liangklfangl/shellGlobStar/blob/master/src/others/link-hard-soft.md)
+
+[React路上遇到的那些问题以及解决方案](http://blog.csdn.net/liangklfang/article/details/53694994)
+
+[npm，webpack学习中遇到的各种问题](http://blog.csdn.net/liangklfang/article/details/53229237)
+
+### 4.你能够学到的东西
+内部所有的代码都有详细的注释，而且都给出了代码相关说明的链接。通过这个项目，对于react*全家桶*应该会有一个深入的了解。该项目牵涉到了常见的React生态中的库，因此命名为全家桶。该项目用到的React生态的主要库如下：
+```js
+    react
+    react-addons-perf
+    react-bootstrap
+    react-dom
+    react-helmet
+    react-redux
+    react-router
+    react-router-bootstrap
+    react-router-redux
+    react-tap-event-plugin
+    react-transform-hmr
+    redux
+    redux-async-connect
+    redux-devtools
+    redux-devtools-dock-monitor
+    redux-devtools-log-monitor
+    redux-form,
+    redux-slider-monitor
+    redux-thunk
+    multireducer
+    ........
+```
+如果你有不懂的地方，也可以通过github上的邮箱联系我。希望我们能够共同进步。同时，我的这些文章也发表到了CSDN上，您可以[点击这里查看](http://blog.csdn.net/liangklfang)
+
+
+### 5.结语
+该项目还有些功能在开发过程中，如果您有什么需求，欢迎您给我issue。我希望能够通过这个项目对React初学者，或者Babel/webpack初学者都有一定的帮助。我再此再强调一下，在我写的这些文章末尾都附加了很多参考文献，而这些参考文献的作用对我的帮助真的很大，在此表示感谢!!!!!
