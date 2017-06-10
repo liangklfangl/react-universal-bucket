@@ -6,7 +6,7 @@ export default class Footer extends React.Component{
 
 		return (
              <div className="footer">
-               Footer
+               开发者:<a href="https://github.com/liangklfangl">高山上的鱼</a>
              </div>
 			)
 	}

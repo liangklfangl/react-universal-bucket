@@ -8,7 +8,8 @@ import {
     LoginSuccess,
     Widget,
     Pagination,
-    Counter
+    Counter,
+    About
   } from './containers';
 //getRoutes(store)
 export default (store) => {
@@ -53,6 +54,10 @@ export default (store) => {
           {
             path:"pagination",
             component:Pagination
+          },
+          {
+            path:"about",
+            component:About
           },
            {
             path:"widget",

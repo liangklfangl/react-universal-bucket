@@ -28,7 +28,7 @@ import Header from "../../components/Header/index";
 import Footer from "../../components/Footer/index";
 Perf.start();
 // const styles = require("./App.less");
- //(1)延缓容器的渲染直到异步的请求结束
+ //(1)延缓容器的渲染直到异步的请求结束(该redux-async-connect返回一个promise，直到这个promise被resolve或者reject后才会渲染我们的react-router对应的组件树)
  //(2)保存数据到store中，同时将加载的数据connect到你的容器中~
  //也就是说，在加载这个页面之前我们要获取到所有的/loadInfo等以及用户是否登录等信息
  //获取到之后才会真正渲染页面~~~

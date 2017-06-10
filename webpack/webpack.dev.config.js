@@ -14,6 +14,9 @@ const program = {
          webpackConfig.plugins=webpackConfig.plugins.filter((plugin)=>{
            return omitPlugins.indexOf(plugin.constructor.name)==-1
          });
+         webpackConfig.module.rules.splice(9,1);
+         //我们对于webpack-isomorphic-tools-config.js指定的image中的图片全部采用了
+         //该webpack-isomorphic-tools的加载，所以webpackcc中默认的png/jpg等都要移除
          return webpackConfig;
     }
   };

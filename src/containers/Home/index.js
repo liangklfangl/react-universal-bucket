@@ -27,6 +27,8 @@ export default class Home extends React.Component{
 <a href="https://github.com/liangklfangl/react-ref">使用react组件的ref回调函数</a>
 <br/>
 <a href="https://github.com/liangklfang/universal-react-demo">react-redux服务端渲染的一个完整例子</a>
+<br/>
+<a href="https://github.com/liangklfangl/react-animation-demo">React动画之react-transition-group使用</a>
 
 <h4> 3.2 webpack相关</h4>
 
@@ -53,6 +55,9 @@ export default class Home extends React.Component{
 <a href="https://github.com/liangklfangl/webpack-compiler-and-compilation">webpack的compiler与compilation对象</a>
 <br/>
 <a href="https://github.com/liangklfang/webpack-dev-middleware">webpack-dev-middleware原理分析</a>
+<br/>
+<a href="https://github.com/liangklfangl/atool-build-source">atool-build打包工具分析</a>
+
 
 <h4> 3.3 Babel相关</h4>
 

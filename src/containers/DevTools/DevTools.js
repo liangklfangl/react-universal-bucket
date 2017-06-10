@@ -13,7 +13,7 @@ import DockMonitor from 'redux-devtools-dock-monitor';
 // <SliderMonitor keyboardEnabled />
 // https://github.com/liangklfang/redux-slider-monitor
 export default createDevTools(
-  <DockMonitor changeMonitorKey='ctrl-m' defaultPosition="right"  toggleVisibilityKey="ctrl-H"
+  <DockMonitor changeMonitorKey='ctrl-m' defaultPosition="bottom"  toggleVisibilityKey="ctrl-H"
                changePositionKey="ctrl-Q">
     <LogMonitor />
   

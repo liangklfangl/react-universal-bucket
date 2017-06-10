@@ -1,10 +1,10 @@
 {
   "javascript": {
-    "main": "http://localhost:8091/dist/main-2712343252e740a8df86.js"
+    "main": "http://localhost:8091/dist/main-ecac17909bf6c12c0690.js"
   },
   "styles": {},
   "assets": {
-    "./src/containers/About/me.png": "http://localhost:8091/dist/8db0daea117ae1aac61f31d791d9a2f9.png",
+    "./src/containers/About/me.png": "data:image/png;base64,bW9kdWxlLmV4cG9ydHMgPSBfX3dlYnBhY2tfcHVibGljX3BhdGhfXyArICI4ZGIwZGFlYTExN2FlMWFhYzYxZjMxZDc5MWQ5YTJmOS5wbmciOw==",
     "./~/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.eot": "http://localhost:8091/dist/f4769f9bdb7466be65088239c12046d1.eot",
     "./~/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.woff": "http://localhost:8091/dist/fa2772327f55d8198301fdb8bcfc8158.woff",
     "./~/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.woff2": "http://localhost:8091/dist/448c34a56d699c29117adc64c43affeb.woff2",

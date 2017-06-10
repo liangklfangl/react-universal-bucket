@@ -107,22 +107,8 @@ module.exports = {
         { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: "url-loader?limit=10000&mimetype=application/octet-stream" },
         { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: "file-loader" },
         { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: "url-loader?limit=10000&mimetype=image/svg+xml" },
-        {
-           test: webpackIsomorphicToolsPlugin.regular_expression('images'), 
-           //这个images是从我们的webpack-isomorphic-tools.config.js中读取的，包含jpg,png等所有的图片
-           // extensions: [
-            //   'jpeg',
-            //   'jpg',
-            //   'png',
-            //   'gif'
-            // ]
-           use: {
-             loader: require.resolve("url-loader"),
-             options:{
-
-             }
-           }
-         },
+        // { test: webpackIsomorphicToolsPlugin.regular_expression('images'), loader: 'file-loader' },
+     
            {
             test: /\.jsx$/,
             exclude :path.resolve("node_modules"),
@@ -144,6 +130,14 @@ module.exports = {
               loader:require.resolve('babel-loader'),
               options:updateCombinedBabelConfig()
             }]
-          }]
+          },
+        {
+           test: webpackIsomorphicToolsPlugin.regular_expression('images'), 
+           //这个images是从我们的webpack-isomorphic-tools.config.js中读取的，包含jpg,png等所有的图片
+            loader: "url-loader",
+            options:{
+              limit:10240
+            }
+         }]
    }
 }

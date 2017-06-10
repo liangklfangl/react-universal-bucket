@@ -5,3 +5,4 @@ export LoginSuccess from "./LoginSuccess/LoginSuccess";
 export Widget from "./Widget/index";
 export Pagination from "./Pagination/index";
 export Counter from "./Counter/index";
+export About from "./About/index";

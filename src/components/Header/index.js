@@ -48,11 +48,8 @@ export default class Header extends React.Component{
 			        	 <NavItem eventKey={2} href="#">分页</NavItem>
 			        	</LinkContainer>
 			        <NavDropdown eventKey={3} title="更多" id="basic-nav-dropdown">
-			          <MenuItem key="MenuItem1" eventKey={3.1}>Action</MenuItem>
-			          <MenuItem key="MenuItem2" eventKey={3.2}>Another action</MenuItem>
-			          <MenuItem key="MenuItem3" eventKey={3.3}>Something else here</MenuItem>
-			          <MenuItem key="MenuItem4" divider />
-			          <MenuItem key="MenuItem5" eventKey={3.3}>Separated link</MenuItem>
+			          <MenuItem key="MenuItem1" href="/about" eventKey={3.1} >关于我</MenuItem>
+			 
 			        </NavDropdown>
 			      </Nav>
 			      <Nav pullRight>

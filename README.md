@@ -60,6 +60,7 @@ react-router,react,redux,react-redux,redux-async-connect,redux-thunk等一系列
   }
 }])
 ```
+
 其中helpers方法来自于其服务端渲染的loadOnServer方法:
 ```js
    loadOnServer({...renderProps, store, helpers: {client}}).then(() => {
@@ -256,6 +257,8 @@ const BookList = connectPromise({
 
 [react-redux服务端渲染的一个完整例子](https://github.com/liangklfang/universal-react-demo)
 
+[React动画之react-transition-group使用](https://github.com/liangklfangl/react-animation-demo)
+
 #### 3.2 webpack相关
 
 [webpack-dev-server原理分析](https://github.com/liangklfangl/webpack-dev-server)
@@ -281,6 +284,8 @@ const BookList = connectPromise({
 [webpack的compiler与compilation对象](https://github.com/liangklfangl/webpack-compiler-and-compilation)
 
 [webpack-dev-middleware原理分析](https://github.com/liangklfang/webpack-dev-middleware)
+
+[atool-build打包工具分析](https://github.com/liangklfangl/atool-build-source)
 
 #### 3.3 Babel相关
 
@@ -322,6 +327,7 @@ const BookList = connectPromise({
     react-router-redux
     react-tap-event-plugin
     react-transform-hmr
+    webpack-isomorphic-tools
     redux
     redux-async-connect
     redux-devtools
@@ -335,6 +341,108 @@ const BookList = connectPromise({
 ```
 如果你有不懂的地方，也可以通过github上的邮箱联系我。希望我们能够共同进步。同时，我的这些文章也发表到了CSDN上，您可以[点击这里查看](http://blog.csdn.net/liangklfang)
 
+### 5.你可能会遇到的问题
+#### 5.1 集成webpackcc的问题
+我们的"React全家桶实例"是使用了webpackcc作为打包工具，该工具集成了很多常见的loader，并保证loader和plugin都只会被添加一次，这样能够有效的减少bug数量，同时该工具对于开发环境和生产环境都有不同的处理，这和我们的平时开发流程非常契合。但是当你和webpack-isomorphic-tools集成起来的时候，你可能会遇到问题。比如对于png/jpg等图片的处理loader，我们的webpackcc已经默认添加进去了，但是为了配合服务端渲染webpack-isomorphic-tools需要通过自己的方式添加：
+```js
+assets: {
+    //处理图片
+    images: {
+      extensions: [
+        'jpeg',
+        'jpg',
+        'png',
+        'gif'
+      ],
+      //这里指定了那些文件类型属于我们的images这种类型，如果只有一种文件类型那么可以使用extension配置
+      //这里的images这种类型在webpack配置为regular_expression('images')
+      parser: WebpackIsomorphicToolsPlugin.url_loader_parser
+    },
+}
+```
+这样就产生了重复添加loader的情况，这个问题我[在这个文章中已经详细解释了](http://blog.csdn.net/liangklfang/article/details/53694994)。这也是为什么我们会在[webpack/webpack.dev.expand.config.js](./webpack/webpack.dev.expand.config.js)文件中做如下处理：
+```js
+const program = {
+    onlyCf : true,
+    cwd : process.cwd(),
+    dev : true,
+    hook:function(webpackConfig){
+         webpackConfig.plugins=webpackConfig.plugins.filter((plugin)=>{
+           return omitPlugins.indexOf(plugin.constructor.name)==-1
+         });
+         webpackConfig.module.rules.splice(9,1);
+          //剔除默认png/jpg类loader
+         return webpackConfig;
+    }
+  };
+```
+#### 5.2 redux-form的新的API
+redux-form在以前的版本中如要实现可以编辑的表格，是通过设置formKey来完成的。但是，最新版本的redux-form已经无法通过formKey来完成该效果。而要[使用我们的form来指定](http://blog.csdn.net/liangklfang/article/details/53694994)，所以你要写出下面的代码:
+```js
+ {
+     widgets.map((widget)=>
+      editing[widget.id] ? <WidgetForm form={widget.id+""} key={String(widget.id)} initialValues={widget}/> :
+         <tr key={widget.id}>
+           <td>{widget.id}</td>
+           <td>{widget.color}</td>
+           <td>{widget.sprocketCount}</td>
+           <td>{widget.owner}</td>
+           <td>
+            <button className="btn btn-primary" onClick={this.handleEdit(widget)}>
+              <i className="fa fa-pencil"/> 编辑
+            </button>
+            <MaterialUiDialog/>
+           </td>
+        </tr>
+    )
+}
+```
+#### 5.3 React抛出错误
+在React全家桶开发中一个很常见的问题就是React已经抛出错误，但是Chrome控制台和shell控制台没有任何消息。比如下面遇到的三个问题:
 
-### 5.结语
-该项目还有些功能在开发过程中，如果您有什么需求，欢迎您给我issue。我希望能够通过这个项目对React初学者，或者Babel/webpack初学者都有一定的帮助。我再此再强调一下，在我写的这些文章末尾都附加了很多参考文献，而这些参考文献的作用对我的帮助真的很大，在此表示感谢!!!!!
+(1)处理表单提交的问题
+```js
+ handleSubmit= (event) => {
+    event.preventDefault();
+    const input = this.refs.username;
+    this.props.login(input.value);
+  }
+  <form onSubmit={this.handleSubmit}>
+   <input ref="username" placeholder="请输入用户名"/>
+   <button className="submit" onClick={this.handleSubmit} value="登陆">登录</button>
+ </form>
+```
+当时将event写成了envnt，里面继续调用的是event.preventDefault，但是并没有抛出任何错误。
+
+(2)bindActionCreators问题
+```js
+@connect((state,{as})=>({
+  counter:state.multireducer[as]
+  //该组件会有自己的as属性作为ownProp，我们根据as来从store中获取到我们需要的数据
+}),(dispatch,{as})=>{
+  return bindActionCreators({increment},dispatch,as)
+  //这里是告诉我们的bindActionCreators的reducerKey
+})
+```
+当时我将bindActionCreators写成了bindActionCreator，但是因为我们调用mapDispatchToProps是异步的，如点击某一个按钮后才会触发，所以抛出错误。但是在shell/chrome控制台都是看不到的。
+
+(3)dispatch问题
+```js
+export default function fetchRecipes(pageInfo) {
+  return dispatch =>
+    api.recipes.index(pageInfo.query).then(resp => {
+         try{
+            dispatch({ type: actionTypes.CONNECTED });
+        }catch(e){
+          console.log("fetchRecipes===",e);
+          //报错信息state.set is not a function
+        }
+       console.log("fetchRecipes,resp",resp);
+      return resp
+    })
+}
+```
+在分页组件中我们依然是dispatch一个action，但是实际上已经报错，却没有打印任何报错信息。但是通过try..catch确实是可以看到的。对于这类问题，我目前还没有找到合适的方法解决，后续会关注这部分内容并及时更新。。。
+
+### 6.结语
+该项目还有些功能在开发过程中，如果您有什么需求，欢迎您给我issue。我希望能够通过这个项目对React初学者，或者Babel/webpack初学者都有一定的帮助。我在此再强调一下，在我写的这些文章末尾都附加了很多参考文献，而这些参考文献的作用对我的帮助真的很大，在此表示感谢!!!!!

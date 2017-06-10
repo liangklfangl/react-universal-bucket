@@ -1,4 +1,3 @@
-console.log("lalallalalall");
 const webpack = require('webpack');
 const path = require('path');
 require('babel-polyfill');
