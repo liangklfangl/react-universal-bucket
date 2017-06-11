@@ -29,6 +29,7 @@ export default class About extends React.Component{
                   <p>2.对于项目中每一段代码都有详细的注释，注释的数量已超过代码的数量。力求初学者易于接受</p>
                   <p>3.对于文中重要的知识点都有详细的文章进行说明。提示您注意文末的参考文献</p>
                   <p>4.集成了webpackcc，对配置的loader,plugin都进行了去重，防止重复loader处理相同文件产生的问题</p>
+                  <p>5.使用webpack 2而不是使用webpack 1</p>
                 </div>
            
                 <h3>关于开发者</h3>

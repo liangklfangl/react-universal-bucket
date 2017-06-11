@@ -65,9 +65,20 @@ export default class Html extends Component {
            {/*将组件renderToString后放在id为content的div内部*/}
           <script dangerouslySetInnerHTML={{__html: `window.__data=${serialize(store.getState())};`}} charSet="UTF-8"/>
           {/*将store.getState序列化后放在window.__data上，让客户端代码可以拿到*/}
-          <script src={assets.javascript.main} charSet="UTF-8"/>
+          <script src={assets.javascript.common}/>
+          {/*下面是将每一个entry中的部分单独打包，如tether，font-awesome-loader，bootstrap-loader等
+          */}
+          {
+            Object.keys(assets.javascript).map((js,index)=>{
+               if(js!=="common"){
+                 return  <script src={assets.javascript[js]} charSet="UTF-8" type="text/javascript"/>
+               }
+            })
+          }
+      
           {/*将我们的main.js，来自于客户端打包并放在特定文件夹下的资源放在页面中，
                这就成了客户端自己的js资源了
+                <script src={assets.javascript.main} charSet="UTF-8"/>
           */}
         </body>
       </html>

@@ -4,18 +4,22 @@
 不得不说，当你真实的去做一个项目的时候，哪怕是一个小小的demo，这都会完全颠覆你对React生态的认识。从一开始的不知道如何入手，到遇到各种困难，然后各种google，最后解决问题，你会发现自己是真的在成长。遇到的问题以及解决方案，我在文章列表中也给出了。时间+经历=成长，对于我来说就够了。默默的对自己说一句，加油把少年!
 
 ### 1.项目说明
-克隆该项目，然后直接运行就可以了。
-
+克隆该项目，然后直接运行就可以了。开发模式下运行:
 ```js
 git clone https://github.com/liangklfangl/react-universal-bucket.git
-npm install 
 npm run dev
-//开发模式下运行下面的命令
-//npm run pro
 ```
 打开http://localhost:3222/ 就可以看到效果。项目截图如下：
 
 ![](./images/project.PNG)
+
+如果是生产环境下，运行下面的命令即可(首先删除webpack-assets.json，重新生成):
+```js
+git clone https://github.com/liangklfangl/react-universal-bucket.git
+npm run build
+//这一步必须执行，否则一直输出[webpack-isomorphic-tools] (waiting for the first Webpack build to finish)
+npm run pro
+```
 
 ### 2.项目基本知识点
 #### 2.1 代理与反代理的基本内容
@@ -442,7 +446,7 @@ export default function fetchRecipes(pageInfo) {
     })
 }
 ```
-在分页组件中我们依然是dispatch一个action，但是实际上已经报错，却没有打印任何报错信息。但是通过try..catch确实是可以看到的。对于这类问题，我目前还没有找到合适的方法解决，后续会关注这部分内容并及时更新。。。
+在分页组件中我们依然是dispatch一个action，但是实际上已经报错，却没有打印任何报错信息。但是通过try..catch确实是可以看到的。对于这类问题，我目前还没有找到合适的方法解决，后续会关注这部分内容并及时更新。。。更新的文件[你可以点击这里](./FutureDo/Questions.md)
 
 ### 6.结语
 该项目还有些功能在开发过程中，如果您有什么需求，欢迎您给我issue。我希望能够通过这个项目对React初学者，或者Babel/webpack初学者都有一定的帮助。我在此再强调一下，在我写的这些文章末尾都附加了很多参考文献，而这些参考文献的作用对我的帮助真的很大，在此表示感谢!!!!!

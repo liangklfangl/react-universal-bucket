@@ -17,7 +17,7 @@ const webpackIsomorphicToolsPlugin = new WebpackIsomorphicToolsPlugin(require('.
 //This is default  
 module.exports = {
   entry: [
-    'webpack-hot-middleware/client',
+    // 'webpack-hot-middleware/client',
     'tether',
     //https://github.com/HubSpot/tether
     //http://tether.io/
@@ -26,7 +26,7 @@ module.exports = {
     `bootstrap-loader`,
     // `bootstrap-loader/lib/bootstrap.loader?extractStyles&configFilePath=${customFile}!bootstrap-loader/no-op.js`,
     //将bootstrap的配置添加到webpack的entry中
-    './src/client.js',
+    './src/client.js'
   ],
 
   output: {
@@ -34,76 +34,79 @@ module.exports = {
     filename: '[name]-[chunkHash].js',
      publicPath: '/dist/'
   },
+
   // devtool: '#cheap-module-eval-source-map',
+
   resolve: { extensions: ['*', '.js'] },
+
   module: {
     rules: [
-      {
-    test: /\.css$/,
-    loader: ExtractTextPlugin.extract({
-      fallback: 'style-loader',
-      use: [
-        {
-          loader: 'css-loader',
-          options: {
-            minimize: true,
-            modules: true,
-            sourceMap: 'inline',
-            importLoaders: 1,
-            localIdentName: '[name]__[local]__[hash:base64:5]',
-          },
-        },
-        {
-          loader:'less-loader',
-          options:{
-            sourceMap: 'inline'
-          }
-        }
-      ],
-    }),
-  },
-      {
-    test: /\.scss$/,
-    use: ExtractTextPlugin.extract({
-      fallback: 'style-loader',
-      use: [
-      {
-        loader:"style-loader",
-        options:{
+  //     {
+  //   test: /\.css$/,
+  //   loader: ExtractTextPlugin.extract({
+  //     fallback: 'style-loader',
+  //     use: [
+  //       {
+  //         loader: 'css-loader',
+  //         options: {
+  //           minimize: true,
+  //           modules: true,
+  //           sourceMap: 'inline',
+  //           importLoaders: 1,
+  //           localIdentName: '[name]__[local]__[hash:base64:5]',
+  //         },
+  //       },
+  //       {
+  //         loader:'less-loader',
+  //         options:{
+  //           sourceMap: 'inline'
+  //         }
+  //       }
+  //     ],
+  //   }),
+  // },
+    //   {
+    // test: /\.scss$/,
+    // use: ExtractTextPlugin.extract({
+    //   fallback: 'style-loader',
+    //   use: [
+    //   {
+    //     loader:"style-loader",
+    //     options:{
 
-        }
-      },
-        {
-          loader: 'css-loader',
-          options: {
-            minimize: true,
-            modules: true,
-            importLoaders: 3,
-             sourceMap: 'inline',
-            localIdentName: '[name]__[local]__[hash:base64:5]'
-          },
-        },
-        {
-          loader:"postcss-loader",
-          options:{
-            sourceMap:true
-          }
-        },
-        {
-         loader:'sass-loader',
-         options:{
-         sourceMap: 'inline'
-         }
-        }
-        // {
-        //   loader: 'sass-resources-loader',
-        //   options: {
-        //     // resources: './app/assets/styles/app-variables.scss'
-        //   }
-        // }
-      ],
-    }),
-  },
+    //     }
+    //   },
+    //     {
+    //       loader: 'css-loader',
+    //       options: {
+    //         minimize: true,
+    //         modules: true,
+    //         importLoaders: 3,
+    //          sourceMap: 'inline',
+    //         localIdentName: '[name]__[local]__[hash:base64:5]'
+    //       },
+    //     },
+    //     {
+    //       loader:"postcss-loader",
+    //       options:{
+    //         sourceMap:true
+    //       }
+    //     },
+    //     {
+    //      loader:'sass-loader',
+    //      options:{
+    //      sourceMap: 'inline'
+    //      }
+    //     }
+    //     // {
+    //     //   loader: 'sass-resources-loader',
+    //     //   options: {
+    //     //     // resources: './app/assets/styles/app-variables.scss'
+    //     //   }
+    //     // }
+    //   ],
+    // }),
+  // },
       {
         test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         use: 'url-loader?limit=10000',
@@ -119,9 +122,16 @@ module.exports = {
     ],
   },
  plugins: [
-    new webpack.HotModuleReplacementPlugin(),
+    // new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
-    //Do not forget in bootstrap version 4
+   new webpack.DefinePlugin({
+     __DEVELOPMENT__ :false,
+      __CLIENT__: true,
+      __SERVER__: false,
+      __DEVELOPMENT__: false,
+      __DEVTOOLS__: false
+    }),
+   //Do not forget in bootstrap version 4
     //You can use expose-loader+ProviderPlugin to expose global variables
     new webpack.ProvidePlugin({
        $: "jquery",

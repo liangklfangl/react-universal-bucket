@@ -20,7 +20,7 @@
         "NODE_PATH": "./src",
         "NODE_ENV": "production",
         "PORT": 8080,
-        "APIPORT": 3030
+        "APIPORT": 3040
       }
     },
     "start-prod-api": {
@@ -28,7 +28,7 @@
       "env": {
         "NODE_PATH": "./api",
         "NODE_ENV": "production",
-        "APIPORT": 3030
+        "APIPORT": 3040
       }
     },
     "start-dev": {
@@ -159,7 +159,7 @@
     "webpack-dev-middleware": "^1.10.2",
     "webpack-hot-middleware": "^2.18.0",
     "webpack-isomorphic-tools": "^2.2.18",
-    "webpackcc": "^2.0.24"
+    "webpackcc": "^2.0.25"
   },
   "devDependencies": {
     "axios": "^0.16.1",

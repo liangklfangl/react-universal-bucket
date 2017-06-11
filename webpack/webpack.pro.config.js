@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 8080;
 const server = express();
 const ExtractTextWebpackPlugin = require("extract-text-webpack-plugin");
 const util = require("util");
-const omitPlugins = ["HtmlWebpackPlugin"];
+const omitPlugins = ["HtmlWebpackPlugin","ExtractTextPlugin"];
 const program = {
     config:path.join(process.cwd(),"./webpack/webpack.pro.expand.config.js"),
     onlyCf : false,
@@ -27,7 +27,8 @@ const program = {
          webpackConfig.plugins=webpackConfig.plugins.filter((plugin)=>{
            return omitPlugins.indexOf(plugin.constructor.name)==-1
          });
-        webpackConfig.plugins.push(new ExtractTextWebpackPlugin({filename:'[name]-[contenthash].css'}));
+        webpackConfig.plugins.push(new ExtractTextWebpackPlugin({filename:'bucket-[contenthash].css'}));
+        console.log("打包之前的配置为:",util.inspect(webpackConfig,{showHidden:true,depth:4}));
          return webpackConfig;
     }
   };
