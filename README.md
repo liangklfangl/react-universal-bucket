@@ -22,7 +22,11 @@ npm run dev
 git clone https://github.com/liangklfangl/react-universal-bucket.git
 npm run build
 //这一步必须执行，否则一直输出[webpack-isomorphic-tools] (waiting for the first Webpack build to finish)
+npm install concurrently -g
+npm install better-npm-run -g
+//如果在mac上需要启动sudo权限,同时在这一步，如果是首次在mac下运行该项目，要执行npm rebuild node-sass
 npm run pro
+//mac下要启动sudo
 ```
 
 ### 2.项目基本知识点
