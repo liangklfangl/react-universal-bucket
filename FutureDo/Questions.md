@@ -227,3 +227,7 @@ const program = {
   };
 ```
 所以，不仅仅是插件，对于Plugin,Loader等都要确保是唯一的。所以，当你打包存在问题的时候一定要检查一下我们的loader和plugin等是否出现了重复了
+
+### 导航栏的样式存在问题
+是因为我自己定义的container这个class和react-bootstrap的class同名了，将自己的class修改为app_container就可以了
+

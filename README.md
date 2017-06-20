@@ -3,11 +3,15 @@
 
 不得不说，当你真实的去做一个项目的时候，哪怕是一个小小的demo，这都会完全颠覆你对React生态的认识。从一开始的不知道如何入手，到遇到各种困难，然后各种google，最后解决问题，你会发现自己是真的在成长。遇到的问题以及解决方案，我在文章列表中也给出了。时间+经历=成长，对于我来说就够了。默默的对自己说一句，加油把少年!
 
-### 1.项目说明
+### 1.windows／mac启动项目说明
 克隆该项目，然后直接运行就可以了。开发模式下运行:
 ```js
 git clone https://github.com/liangklfangl/react-universal-bucket.git
+npm install concurrently -g
+npm install better-npm-run -g
+//如果在mac上需要启动sudo权限,同时在这一步，如果是首次在mac下运行该项目，要执行npm rebuild node-sass
 npm run dev
+//mac下启动sudo
 ```
 打开http://localhost:3222/ 就可以看到效果。项目截图如下：
 

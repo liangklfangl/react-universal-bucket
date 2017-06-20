@@ -12,7 +12,6 @@ export default class Header extends React.Component{
      console.log("home instantiated");
       const user = this.props.user;
 		return (
-            <div className="header">
 			   <Navbar inverse collapseOnSelect>
 			    <Navbar.Header>
 			      <Navbar.Brand>
@@ -21,7 +20,7 @@ export default class Header extends React.Component{
 			      <Navbar.Toggle />
 			    </Navbar.Header>
 			    <Navbar.Collapse>
-			      <Nav>
+			      <Nav pullLeft>
 			       <LinkContainer to="/">
 			          <NavItem eventKey={1} href="#">首页</NavItem>
 			        </LinkContainer>
@@ -39,26 +38,35 @@ export default class Header extends React.Component{
                           <NavItem eventKey={2} href="#">Survey</NavItem>
 			        */}
 	
-			        {
-			        	!user&&<LinkContainer to="/login">
-			        	 <NavItem eventKey={2} href="#">登录</NavItem>
-			        	</LinkContainer>
-			        }
+			  
 			        <LinkContainer to="/pagination">
 			        	 <NavItem eventKey={2} href="#">分页</NavItem>
-			        	</LinkContainer>
+			        </LinkContainer>
 			        <NavDropdown eventKey={3} title="更多" id="basic-nav-dropdown">
 			          <MenuItem key="MenuItem1" href="/about" eventKey={3.1} >关于我</MenuItem>
-			 
 			        </NavDropdown>
 			      </Nav>
+			      {/*
+                     这里的Navbar.Collapse下面会有两个同级的Nav元素，一个pullLeft一个pullRight
+			      */}
 			      <Nav pullRight>
-			        <NavItem eventKey={1} href="#">Link Right</NavItem>
-			        <NavItem eventKey={2} href="#">Link Right</NavItem>
+			        <Choose>
+					  <When condition={ !user }>
+					   <LinkContainer to="/login">
+			        	 <NavItem eventKey={2} href="#">登录</NavItem>
+			        	</LinkContainer>
+					  </When>
+					  <Otherwise>
+					    <NavItem eventKey={2} href="#" style={{color:"#fff"}}>
+					   你目前登录的账号为{user.name}
+					   </NavItem>
+					  </Otherwise>
+					</Choose>
+
+                   		
 			      </Nav>
 			    </Navbar.Collapse>
 			  </Navbar>
-            </div>
 			)
 	}
 }

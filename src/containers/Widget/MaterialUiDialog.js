@@ -31,6 +31,7 @@ export default class MaterialUiDialog extends React.Component{
     this.setState({open: true});
   };
 
+
   handleClose = () => {
     this.setState({open: false});
   };
@@ -51,7 +52,7 @@ export default class MaterialUiDialog extends React.Component{
 
   	 return (
   	  <MuiThemeProvider muiTheme={muiTheme}>
-           <div>
+           <div style={{display:"inline-block"}}>
               <RaisedButton label="删除" onTouchTap={this.handleOpen} />
               <Dialog
                 title="删除"

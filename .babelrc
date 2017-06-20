@@ -4,6 +4,7 @@
     "transform-runtime",
     "add-module-exports",
     "transform-decorators-legacy",
-    "transform-react-display-name"
+    "transform-react-display-name",
+    "jsx-control-statements"
   ]
 }

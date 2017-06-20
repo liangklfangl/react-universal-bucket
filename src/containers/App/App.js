@@ -147,7 +147,7 @@ export default class App extends React.Component{
      // console.log("App传入的logout内容:",this.props.logout.toString());
 		 // <div  onClick={this.handleLogout}>登出</div>
     return (
-             <div className="container">
+             <div className="app_container">
                <Header user={user}/>
                  {
                 	this.props.children

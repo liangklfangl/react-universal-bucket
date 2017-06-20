@@ -165,6 +165,7 @@
     "axios": "^0.16.1",
     "bootstrap": "^4.0.0-alpha.6",
     "clean-webpack-plugin": "^0.1.16",
+    "jsx-control-statements": "^3.2.5",
     "pubsub-js": "^1.5.7",
     "strip-loader": "^0.1.2"
   }

@@ -1,29 +1,35 @@
 {
- "javascript":{
- "0":"/dist/0-ee48cd93dd4fa388f267.js",
- "1":"/dist/1-e9d27d221cfb61ce739f.js",
- "2":"/dist/2-9aa6a1dcb1be31d29837.js",
- "3":"/dist/3-ad2d99cb08101ec6ea3d.js",
- "common":"/dist/common.js"
- },
- "styles":{
- "2":"/dist/bucket-3838b6ba6327c9ee9945c2d99448bd26.css",
- "3":"/dist/bucket-8c602a818042bfc7bdee50119fa68c3f.css"
- },
- "assets":{
- "./src/containers/About/me.png":"/dist/8db0daea117ae1aac61f31d791d9a2f9.png",
- "./~/font-awesome/fonts/fontawesome-webfont.eot":"/dist/674f50d287a8c48dc19ba404d20fe713.eot",
- "./~/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.eot":"/dist/f4769f9bdb7466be65088239c12046d1.eot",
- "./~/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.ttf":"/dist/e18bbf611f2a2e43afc071aa2f4e1512.ttf",
- "./~/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.woff":"/dist/fa2772327f55d8198301fdb8bcfc8158.woff",
- "./~/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.woff2":"/dist/448c34a56d699c29117adc64c43affeb.woff2",
- "./~/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.svg":"/dist/89889688147bd7575d6327160d64e760.svg",
- "./src/components/Footer/index.less":"// removed by extract-text-webpack-plugin",
- "./src/components/Header/index.less":"// removed by extract-text-webpack-plugin",
- "./src/components/InfoBar/index.less":"// removed by extract-text-webpack-plugin",
- "./src/containers/About/index.less":"// removed by extract-text-webpack-plugin",
- "./src/containers/Pagination/index.less":"// removed by extract-text-webpack-plugin",
- "./src/containers/Widget/index.less":"// removed by extract-text-webpack-plugin",
- "./src/containers/login/index.less":"// removed by extract-text-webpack-plugin"
- }
+  "javascript": {
+    "main": "http://localhost:8091/dist/main-80e22cb94641531f31d2.js"
+  },
+  "styles": {},
+  "assets": {
+    "./src/containers/About/me.png": "http://localhost:8091/dist/8db0daea117ae1aac61f31d791d9a2f9.png",
+    "./~/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.eot": "http://localhost:8091/dist/f4769f9bdb7466be65088239c12046d1.eot",
+    "./~/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.woff": "http://localhost:8091/dist/fa2772327f55d8198301fdb8bcfc8158.woff",
+    "./~/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.woff2": "http://localhost:8091/dist/448c34a56d699c29117adc64c43affeb.woff2",
+    "./~/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.ttf": "http://localhost:8091/dist/e18bbf611f2a2e43afc071aa2f4e1512.ttf",
+    "./~/bootstrap-sass/assets/fonts/bootstrap/glyphicons-halflings-regular.svg": "http://localhost:8091/dist/89889688147bd7575d6327160d64e760.svg",
+    "./src/components/Footer/index.less": {
+      "_style": ".footer{height:50px;padding-left:10px;margin-top:50px;font-size:28px;background-color:gray}"
+    },
+    "./src/components/Header/index.less": {
+      "_style": ""
+    },
+    "./src/components/InfoBar/index.less": {
+      "_style": ".inforBar-container{background-color:pink;padding-left:10px}.loader-info-from-server{display:inline-block;height:40px}"
+    },
+    "./src/containers/About/index.less": {
+      "_style": ""
+    },
+    "./src/containers/Pagination/index.less": {
+      "_style": ".pagination,.thead th{text-align:center}"
+    },
+    "./src/containers/Widget/index.less": {
+      "_style": ""
+    },
+    "./src/containers/login/index.less": {
+      "_style": ".submit{display:inline-block;with:50px;height:30px;position:relative}.form-content{padding:50px 10px}"
+    }
+  }
 }
